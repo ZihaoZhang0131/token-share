@@ -1,0 +1,100 @@
+name: token-station
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: token_station
+      POSTGRES_USER: token_station
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U token_station -d token_station"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$${REDIS_PASSWORD}\" redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks: [internal]
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=*"]
+    environment:
+      APP_NAME: Token Station
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+asyncpg://token_station:${POSTGRES_PASSWORD}@postgres:5432/token_station
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      SECRET_KEY: ${SECRET_KEY}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY}
+      TOKEN_ENCRYPTION_KEY_VERSION: ${TOKEN_ENCRYPTION_KEY_VERSION:-1}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD}
+      CORS_ORIGINS: '["https://${DOMAIN}"]'
+      SECURE_COOKIES: "true"
+      AUTO_CREATE_TABLES: "false"
+      ALLOW_PRIVATE_UPSTREAMS: "false"
+      FRONTEND_DIST: /nonexistent
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  nginx:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+      TLS_ENABLED: ${TLS_ENABLED:-false}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot_webroot:/var/www/certbot
+      - ./deploy/nginx/proxy_params:/etc/nginx/proxy_params:ro
+    depends_on:
+      api: { condition: service_healthy }
+    networks: [internal]
+
+  certbot:
+    image: certbot/certbot:latest
+    profiles: ["maintenance"]
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot_webroot:/var/www/certbot
+
+volumes:
+  postgres_data:
+  redis_data:
+  letsencrypt:
+  certbot_webroot:
+
+networks:
+  internal:
+    driver: bridge
