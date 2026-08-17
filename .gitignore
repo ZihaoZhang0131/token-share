@@ -5,6 +5,7 @@
 .ruff_cache/
 __pycache__/
 *.py[cod]
+*.egg-info/
 *.db
 *.sqlite3
 backend/.coverage
