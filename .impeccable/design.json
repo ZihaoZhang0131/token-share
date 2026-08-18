@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-18T15:37:19Z",
+  "title": "Design System: Token Station",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Control-Rail Ink",
+        "canonical": "#012445",
+        "tonalRamp": ["oklch(15% 0.073 251.0)", "oklch(25% 0.073 251.0)", "oklch(35% 0.073 251.0)", "oklch(45% 0.073 251.0)", "oklch(60% 0.073 251.0)", "oklch(72% 0.073 251.0)", "oklch(84% 0.073 251.0)", "oklch(95% 0.073 251.0)"]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Engraved Ink",
+        "canonical": "#36556a",
+        "tonalRamp": ["oklch(15% 0.051 239.1)", "oklch(25% 0.051 239.1)", "oklch(35% 0.051 239.1)", "oklch(45% 0.051 239.1)", "oklch(60% 0.051 239.1)", "oklch(72% 0.051 239.1)", "oklch(84% 0.051 239.1)", "oklch(95% 0.051 239.1)"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Readout",
+        "canonical": "#5e7280",
+        "tonalRamp": ["oklch(15% 0.032 238.7)", "oklch(25% 0.032 238.7)", "oklch(35% 0.032 238.7)", "oklch(45% 0.032 238.7)", "oklch(60% 0.032 238.7)", "oklch(72% 0.032 238.7)", "oklch(84% 0.032 238.7)", "oklch(95% 0.032 238.7)"]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Mineral Enamel",
+        "canonical": "#f8f7f1",
+        "tonalRamp": ["oklch(15% 0.008 98.9)", "oklch(25% 0.008 98.9)", "oklch(35% 0.008 98.9)", "oklch(45% 0.008 98.9)", "oklch(60% 0.008 98.9)", "oklch(72% 0.008 98.9)", "oklch(84% 0.008 98.9)", "oklch(95% 0.008 98.9)"]
+      },
+      "ground-deep": {
+        "role": "neutral",
+        "displayName": "Recessed Enamel",
+        "canonical": "#f0efe9",
+        "tonalRamp": ["oklch(15% 0.008 98.9)", "oklch(25% 0.008 98.9)", "oklch(35% 0.008 98.9)", "oklch(45% 0.008 98.9)", "oklch(60% 0.008 98.9)", "oklch(72% 0.008 98.9)", "oklch(84% 0.008 98.9)", "oklch(95% 0.008 98.9)"]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Instrument Panel",
+        "canonical": "#fcfbf7",
+        "tonalRamp": ["oklch(15% 0.005 95.1)", "oklch(25% 0.005 95.1)", "oklch(35% 0.005 95.1)", "oklch(45% 0.005 95.1)", "oklch(60% 0.005 95.1)", "oklch(72% 0.005 95.1)", "oklch(84% 0.005 95.1)", "oklch(95% 0.005 95.1)"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Metal Seam",
+        "canonical": "#c1ccd3",
+        "tonalRamp": ["oklch(15% 0.016 235.4)", "oklch(25% 0.016 235.4)", "oklch(35% 0.016 235.4)", "oklch(45% 0.016 235.4)", "oklch(60% 0.016 235.4)", "oklch(72% 0.016 235.4)", "oklch(84% 0.016 235.4)", "oklch(95% 0.016 235.4)"]
+      },
+      "line-soft": {
+        "role": "neutral",
+        "displayName": "Hairline Seam",
+        "canonical": "#dce2e3",
+        "tonalRamp": ["oklch(15% 0.007 208.8)", "oklch(25% 0.007 208.8)", "oklch(35% 0.007 208.8)", "oklch(45% 0.007 208.8)", "oklch(60% 0.007 208.8)", "oklch(72% 0.007 208.8)", "oklch(84% 0.007 208.8)", "oklch(95% 0.007 208.8)"]
+      },
+      "circuit": {
+        "role": "primary",
+        "displayName": "Live Circuit Cobalt",
+        "canonical": "#095294",
+        "tonalRamp": ["oklch(15% 0.126 252.3)", "oklch(25% 0.126 252.3)", "oklch(35% 0.126 252.3)", "oklch(45% 0.126 252.3)", "oklch(60% 0.126 252.3)", "oklch(72% 0.126 252.3)", "oklch(84% 0.126 252.3)", "oklch(95% 0.126 252.3)"]
+      },
+      "circuit-dark": {
+        "role": "primary",
+        "displayName": "Deep Circuit Cobalt",
+        "canonical": "#073e70",
+        "tonalRamp": ["oklch(15% 0.101 251.8)", "oklch(25% 0.101 251.8)", "oklch(35% 0.101 251.8)", "oklch(45% 0.101 251.8)", "oklch(60% 0.101 251.8)", "oklch(72% 0.101 251.8)", "oklch(84% 0.101 251.8)", "oklch(95% 0.101 251.8)"]
+      },
+      "circuit-soft": {
+        "role": "primary",
+        "displayName": "Pale Circuit Wash",
+        "canonical": "#e7eff5",
+        "tonalRamp": ["oklch(15% 0.012 239.9)", "oklch(25% 0.012 239.9)", "oklch(35% 0.012 239.9)", "oklch(45% 0.012 239.9)", "oklch(60% 0.012 239.9)", "oklch(72% 0.012 239.9)", "oklch(84% 0.012 239.9)", "oklch(95% 0.012 239.9)"]
+      },
+      "ok": {
+        "role": "tertiary",
+        "displayName": "Protection Green",
+        "canonical": "#237354",
+        "tonalRamp": ["oklch(15% 0.092 163.4)", "oklch(25% 0.092 163.4)", "oklch(35% 0.092 163.4)", "oklch(45% 0.092 163.4)", "oklch(60% 0.092 163.4)", "oklch(72% 0.092 163.4)", "oklch(84% 0.092 163.4)", "oklch(95% 0.092 163.4)"]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Deep Safety Amber",
+        "canonical": "#b66516",
+        "tonalRamp": ["oklch(15% 0.133 57.7)", "oklch(25% 0.133 57.7)", "oklch(35% 0.133 57.7)", "oklch(45% 0.133 57.7)", "oklch(60% 0.133 57.7)", "oklch(72% 0.133 57.7)", "oklch(84% 0.133 57.7)", "oklch(95% 0.133 57.7)"]
+      },
+      "warn-bright": {
+        "role": "tertiary",
+        "displayName": "Safety Amber",
+        "canonical": "#d67d21",
+        "tonalRamp": ["oklch(15% 0.147 60.1)", "oklch(25% 0.147 60.1)", "oklch(35% 0.147 60.1)", "oklch(45% 0.147 60.1)", "oklch(60% 0.147 60.1)", "oklch(72% 0.147 60.1)", "oklch(84% 0.147 60.1)", "oklch(95% 0.147 60.1)"]
+      },
+      "fault": {
+        "role": "tertiary",
+        "displayName": "Fault Red",
+        "canonical": "#b63832",
+        "tonalRamp": ["oklch(15% 0.163 27.0)", "oklch(25% 0.163 27.0)", "oklch(35% 0.163 27.0)", "oklch(45% 0.163 27.0)", "oklch(60% 0.163 27.0)", "oklch(72% 0.163 27.0)", "oklch(84% 0.163 27.0)", "oklch(95% 0.163 27.0)"]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Focus Blue",
+        "canonical": "#0c6db7",
+        "tonalRamp": ["oklch(15% 0.141 249.3)", "oklch(25% 0.141 249.3)", "oklch(35% 0.141 249.3)", "oklch(45% 0.141 249.3)", "oklch(60% 0.141 249.3)", "oklch(72% 0.141 249.3)", "oklch(84% 0.141 249.3)", "oklch(95% 0.141 249.3)"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Identity Display",
+        "purpose": "Split-screen login identity only."
+      },
+      "headline": {
+        "displayName": "Instrument Headline",
+        "purpose": "Page titles and major usage readouts."
+      },
+      "title": {
+        "displayName": "Panel Title",
+        "purpose": "Panel heads, circuit labels, and compact product marks."
+      },
+      "body": {
+        "displayName": "Operational Body",
+        "purpose": "Controls, table cells, form copy, and explanations."
+      },
+      "label": {
+        "displayName": "Telemetry Label",
+        "purpose": "Identifiers, timestamps, counters, ledger headers, and readouts."
+      }
+    },
+    "shadows": [
+      {
+        "name": "modal-lift",
+        "value": "0 24px 60px rgba(1,36,69,.2)",
+        "purpose": "Blocking dialogs above the ink-tinted backdrop; operational surfaces remain flat."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-snap",
+        "value": "160ms ease-out",
+        "purpose": "Button color, border, background, and press-state transitions."
+      },
+      {
+        "name": "field-focus",
+        "value": "150ms ease-out",
+        "purpose": "Input border and focus-ring transitions."
+      },
+      {
+        "name": "circuit-entry",
+        "value": "620ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "One restrained access-line trace on entry when reduced motion is not requested."
+      }
+    ],
+    "breakpoints": [
+      { "name": "compressed-desktop", "value": "1120px" },
+      { "name": "mobile", "value": "760px" },
+      { "name": "compact-mobile", "value": "420px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Compact cobalt switch for the next decisive operation.",
+      "html": "<button class=\"ds-button ds-button-primary\" type=\"button\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>新增上游</button>",
+      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out, transform 160ms ease-out; } .ds-button-primary { color: #fff; background: var(--circuit); border-color: var(--circuit); } .ds-button-primary:hover { background: var(--circuit-dark); border-color: var(--circuit-dark); } .ds-button-primary:active { transform: translateY(1px); } .ds-button-primary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Seam-bounded enamel switch for supporting actions.",
+      "html": "<button class=\"ds-button ds-button-secondary\" type=\"button\">刷新</button>",
+      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out, transform 160ms ease-out; } .ds-button-secondary { color: var(--ink); background: var(--panel); border-color: #9fb0ba; } .ds-button-secondary:hover { color: var(--circuit); background: #fff; border-color: var(--circuit); } .ds-button-secondary:active { transform: translateY(1px); } .ds-button-secondary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Fault-red switch reserved for destructive actions.",
+      "html": "<button class=\"ds-button ds-button-danger\" type=\"button\">撤销 Key</button>",
+      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 160ms ease-out, transform 160ms ease-out; } .ds-button-danger { color: #fff; background: var(--fault); border-color: var(--fault); } .ds-button-danger:hover { opacity: .88; } .ds-button-danger:active { transform: translateY(1px); } .ds-button-danger:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet ink action that reveals a pale circuit field on hover.",
+      "html": "<button class=\"ds-button ds-button-ghost\" type=\"button\">编辑 / 换 Key</button>",
+      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, transform 160ms ease-out; } .ds-button-ghost { color: var(--ink-soft); background: transparent; } .ds-button-ghost:hover { color: var(--circuit); background: var(--circuit-soft); } .ds-button-ghost:active { transform: translateY(1px); } .ds-button-ghost:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field-input",
+      "description": "Compact labeled field with a white inset and cobalt focus ring.",
+      "html": "<label class=\"ds-field\"><span>公开模型名</span><input type=\"text\" placeholder=\"qwen-plus\"/><small>用户只会看到这个名称</small></label>",
+      "css": ".ds-field { min-width: 0; display: flex; flex-direction: column; gap: 7px; color: var(--ink-soft); font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 12px; font-weight: 700; } .ds-field input { width: 100%; height: 42px; padding: 0 11px; color: var(--ink); caret-color: var(--circuit); background: #fff; border: 1px solid #aebbc2; border-radius: 2px; outline: none; font: inherit; transition: border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-field input:hover { border-color: #718a99; } .ds-field input:focus { border-color: var(--circuit); box-shadow: 0 0 0 3px rgba(9,82,148,.14); } .ds-field small { color: var(--muted); font-size: 11px; font-weight: 500; line-height: 1.45; }"
+    },
+    {
+      "name": "Active Navigation Control",
+      "kind": "nav",
+      "refersTo": "nav-active",
+      "description": "Ink-filled current section in the desktop rail or mobile instrument strip.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"管理控制台\"><button class=\"ds-nav-item ds-nav-item-active\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M12 12l4-4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>总览</button><button class=\"ds-nav-item\">上游</button></nav>",
+      "css": ".ds-nav { width: 188px; padding: 6px; background: var(--ground-deep); } .ds-nav-item { width: 100%; min-height: 42px; margin: 2px 0; padding: 0 11px; color: var(--ink-soft); background: transparent; border: 1px solid transparent; border-radius: 2px; display: flex; align-items: center; gap: 10px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 650; cursor: pointer; } .ds-nav-item:hover { color: var(--ink); background: #fff; border-color: var(--line-soft); } .ds-nav-item-active { color: #fff; background: var(--ink); border-color: var(--ink); } .ds-nav-item-active svg { color: #8ec1e2; } .ds-nav-item:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Healthy Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "Compact health label used inside ledgers and key rows.",
+      "html": "<span class=\"ds-pill ds-pill-ok\"><i aria-hidden=\"true\"></i>正常</span>",
+      "css": ".ds-pill { width: fit-content; padding: 3px 7px; color: var(--ink-soft); background: #e3e8e8; border-radius: 99px; display: inline-flex; align-items: center; gap: 5px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 9px; font-weight: 750; } .ds-pill i { width: 7px; height: 7px; background: var(--ok); border-radius: 50%; } .ds-pill-ok { color: #15543d; background: #d9eee4; }"
+    },
+    {
+      "name": "Operational Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Flat seam-defined container for ledgers, charts, and working content.",
+      "html": "<section class=\"ds-panel\"><header><div><h2>最近调用</h2><p>仅展示元数据，不保存输入和回答正文</p></div><span aria-hidden=\"true\">⌁</span></header><div class=\"ds-panel-row\"><i></i><strong>qwen-plus</strong><code>req_4ac2f20e</code><span>200</span></div></section>",
+      "css": ".ds-panel { overflow: hidden; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 3px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; } .ds-panel header { min-height: 62px; padding: 14px 17px; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; justify-content: space-between; } .ds-panel h2 { margin: 0 0 3px; font-family: \"DIN Alternate\", \"Avenir Next Condensed\", \"Arial Narrow\", sans-serif; font-size: 17px; } .ds-panel p { margin: 0; color: var(--muted); font-size: 10px; } .ds-panel-row { min-height: 43px; padding: 0 14px; display: grid; grid-template-columns: 8px 1fr 130px 50px; align-items: center; gap: 12px; color: #183b51; font-size: 10px; font-variant-numeric: tabular-nums; } .ds-panel-row:hover { background: #f2f5f5; } .ds-panel-row i { width: 7px; height: 7px; background: var(--ok); border-radius: 50%; } .ds-panel-row code { overflow: hidden; color: var(--muted); font-family: \"SFMono-Regular\", \"Roboto Mono\", Consolas, monospace; font-size: 9px; text-overflow: ellipsis; }"
+    },
+    {
+      "name": "Access Circuit Node",
+      "kind": "custom",
+      "description": "Signature live-stage module combining a circuit node, state lamp, and operational readout.",
+      "html": "<article class=\"ds-circuit-node\"><span class=\"ds-node-symbol\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" aria-hidden=\"true\"><ellipse cx=\"12\" cy=\"5\" rx=\"7\" ry=\"3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M5 5v12c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 11c0 1.7 3.1 3 7 3s7-1.3 7-3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg></span><span class=\"ds-node-copy\"><small>上游服务</small><strong>2 / 2</strong><em>加密凭证 · 公网 HTTPS</em></span><i class=\"ds-state-lamp\" aria-label=\"通路\"></i></article>",
+      "css": ".ds-circuit-node { min-height: 126px; padding: 12px 4px; position: relative; color: var(--ink); display: flex; align-items: center; gap: 12px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; } .ds-circuit-node::after { content: \"\"; height: 3px; position: absolute; left: 48px; right: 0; top: calc(50% - 1px); z-index: -1; background: var(--circuit); } .ds-node-symbol { width: 50px; height: 50px; flex: 0 0 auto; color: var(--circuit); background: var(--panel); border: 2px solid var(--circuit); border-radius: 50%; display: grid; place-items: center; } .ds-node-copy { display: flex; flex-direction: column; gap: 4px; background: var(--ground); padding-right: 8px; } .ds-node-copy small { color: var(--muted); font-size: 10px; font-weight: 800; } .ds-node-copy strong { font-family: \"DIN Alternate\", \"Avenir Next Condensed\", \"Arial Narrow\", sans-serif; font-size: 22px; font-variant-numeric: tabular-nums; } .ds-node-copy em { color: var(--muted); font-size: 9px; font-style: normal; } .ds-state-lamp { width: 8px; height: 8px; position: absolute; right: 4px; top: 12px; background: var(--circuit); border-radius: 50%; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Electric-Utility Single-Line Dispatch Board",
+    "overview": "Token Station is an operational control surface, not a generic SaaS dashboard. Its visual world is a mineral-enamel dispatch board where upstream providers, public model routes, quota checks, and user permissions read as one traceable electrical circuit. Ink-blue control rails and hard metal seams establish authority; cobalt shows the live path; amber isolates degraded or incomplete stages; red is reserved for faults.\n\nThe system is compact, flat, and exact. Continuous ledgers, tabular figures, engraved-looking labels, breaker geometry, and near-square controls make the interface feel built for supervision rather than presentation. The login, administrator console, user console, forms, and dialogs all remain inside the same material world.",
+    "keyCharacteristics": [
+      "Mineral-enamel grounds with ink-blue control structure.",
+      "One visible access circuit as the signature operational model.",
+      "Compact ledgers, tabular readouts, and monospaced identifiers.",
+      "Hard seams, near-square controls, and restrained state motion.",
+      "Cobalt live states, amber warnings, red faults, and green confirmation only."
+    ],
+    "rules": [
+      {
+        "name": "The Three-State Circuit Rule",
+        "body": "Cobalt means live, amber means degraded or waiting, and red means blocked; never swap these meanings or rely on color without text, icon, or geometry.",
+        "section": "colors"
+      },
+      {
+        "name": "The Green Is Confirmation Rule",
+        "body": "Green confirms health or protection only; it never replaces cobalt as the system's primary voice.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readout Split Rule",
+        "body": "Human-facing Chinese copy stays in the workhorse sans; identifiers, timestamps, aliases, counters, and telemetry move to the monospaced readout face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Keep operational surfaces flush and seam-defined; reserve physical lift for modal interruption only.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do make the upstream-to-user dependency chain visible before asking operators to interpret rows of data.",
+      "Do use hard seams, compact labels, and tabular figures to make state easy to scan and compare.",
+      "Do preserve the cobalt, amber, red state grammar with text, icon, or shape redundancy.",
+      "Do adapt the circuit into an ordered vertical sequence on narrow screens while preserving its meaning.",
+      "Do keep sensitive, destructive, empty, loading, and error states explicit and operational."
+    ],
+    "donts": [
+      "Don't replace the continuous dispatch-board structure with floating bento cards, glass surfaces, gradients, or decorative shadows.",
+      "Don't use green as the primary brand color or red for ordinary emphasis.",
+      "Don't soften controls into oversized capsules; rounded forms are reserved for lamps, nodes, and compact status pills.",
+      "Don't add photography, perspective device mockups, decorative texture, or invented security claims.",
+      "Don't rasterize circuit labels, data, icons, or topology that can remain semantic HTML, SVG, and CSS."
+    ]
+  }
+}

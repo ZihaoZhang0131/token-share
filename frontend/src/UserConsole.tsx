@@ -35,11 +35,11 @@ export default function UserConsole({ session }: { session: Session }) {
 
   return <div className="console-layout">
     <aside className="side-nav"><div><p className="nav-caption">个人控制台</p>
-      <button className={tab === "usage" ? "active" : ""} onClick={() => setTab("usage")}><BarChart3 size={17} />用量</button>
-      <button className={tab === "keys" ? "active" : ""} onClick={() => setTab("keys")}><KeyRound size={17} />访问 Key</button>
-      <button className={tab === "guide" ? "active" : ""} onClick={() => setTab("guide")}><BookOpen size={17} />接入指南</button>
+      <button className={tab === "usage" ? "active" : ""} onClick={() => setTab("usage")} aria-current={tab === "usage" ? "page" : undefined}><BarChart3 size={17} />用量</button>
+      <button className={tab === "keys" ? "active" : ""} onClick={() => setTab("keys")} aria-current={tab === "keys" ? "page" : undefined}><KeyRound size={17} />访问 Key</button>
+      <button className={tab === "guide" ? "active" : ""} onClick={() => setTab("guide")} aria-current={tab === "guide" ? "page" : undefined}><BookOpen size={17} />接入指南</button>
     </div><div className="security-note"><ShieldCheck size={17} /><span><strong>隐私模式</strong><small>不保存提示词和回答正文</small></span></div></aside>
-    <main className="workspace"><div className="page-head"><div><p className="eyebrow">{session.user.email}</p><h1>{tab === "usage" ? "本月用量" : tab === "keys" ? "访问 Key" : "接入指南"}</h1></div>{tab === "keys" && <Button onClick={() => setCreateOpen(true)} disabled={keys.filter((key) => key.active).length >= 5}><Plus size={16} />创建 Key</Button>}</div>
+    <main className="workspace"><div className="page-head"><div><h1>{tab === "usage" ? "本月用量" : tab === "keys" ? "访问 Key" : "接入指南"}</h1><p className="page-subtitle">{session.user.email}</p></div>{tab === "keys" && <Button onClick={() => setCreateOpen(true)} disabled={keys.filter((key) => key.active).length >= 5}><Plus size={16} />创建 Key</Button>}</div>
       {error && <InlineError message={error} />}
       {tab === "usage" && <UsageView usage={usage} models={models} />}
       {tab === "keys" && <KeysView keys={keys} onRevoke={revoke} />}

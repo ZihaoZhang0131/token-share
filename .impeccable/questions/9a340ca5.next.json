@@ -1,0 +1,44 @@
+{
+  "title": "确认单线调度台的构图",
+  "question": "三张图使用同一视觉世界，只改变信息拓扑。请选择构图，或说明要组合、修改或拒绝什么。",
+  "options": [
+    {
+      "id": "topology-plus-events",
+      "label": "拓扑 + 实时事件",
+      "kicker": "DIRECTION COMP",
+      "lineage": "实体单线模拟屏",
+      "thesis": "中央链路解释访问机制，右侧事件流承担即时判断。",
+      "palette": ["#F2F0E8", "#172C36", "#236A8D", "#D88428", "#B63832"],
+      "materials": ["搪瓷控制面板", "丝印线路", "机械标签槽"],
+      "viewport": "左侧控制轨、中央上游→模型→用户拓扑、右侧实时事件、底部连续台账。",
+      "risk": "右侧事件带会压缩中央拓扑在中等桌面宽度下的空间。",
+      "comp": ".impeccable/mocks/decision/assigned.webp"
+    },
+    {
+      "id": "horizontal-circuit",
+      "label": "水平访问电路",
+      "kicker": "COMPOSITION 02",
+      "lineage": "贯穿式供电母线",
+      "thesis": "访问链路成为横贯首屏的唯一主线，台账在下方承接操作。",
+      "palette": ["#F2F0E8", "#172C36", "#236A8D", "#D88428", "#B63832"],
+      "materials": ["搪瓷控制面板", "丝印线路", "机械标签槽"],
+      "viewport": "窄侧栏，上方 58% 横向访问电路，下方 42% 双层运行台账，无右栏。",
+      "risk": "关系非常易读，但对最近事件的即时扫描不如独立事件带。",
+      "comp": ".impeccable/mocks/composition-horizontal.png"
+    },
+    {
+      "id": "vertical-bus",
+      "label": "纵向分配母线",
+      "kicker": "COMPOSITION 03",
+      "lineage": "配电柜垂直母线",
+      "thesis": "一条纵向母线把上游馈入、模型分配和用户权限放进同一观察面。",
+      "palette": ["#F2F0E8", "#172C36", "#236A8D", "#D88428", "#B63832"],
+      "materials": ["搪瓷控制面板", "丝印线路", "机械标签槽"],
+      "viewport": "极窄侧轨，中央纵向母线与左右支路，右上行动队列，底部双台账。",
+      "risk": "结构最有记忆点，但在移动端需要把支路重新排序为分段流程。",
+      "comp": ".impeccable/mocks/composition-vertical.png"
+    }
+  ],
+  "followup": true,
+  "steer": true
+}

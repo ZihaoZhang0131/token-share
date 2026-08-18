@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import { useEffect, useId, useRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 export function Button({
@@ -54,18 +54,44 @@ export function Modal({
   onClose: () => void;
   wide?: boolean;
 }) {
+  const titleId = useId();
+  const dialogRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const dialog = dialogRef.current;
+    const preferred = dialog?.querySelector<HTMLElement>("input:not([disabled]), select:not([disabled]), textarea:not([disabled])");
+    const fallback = dialog?.querySelector<HTMLElement>("button:not([disabled]), [href], [tabindex]:not([tabindex='-1'])");
+    (preferred ?? fallback)?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+      if (event.key !== "Tab" || !dialog) return;
+      const focusable = [...dialog.querySelectorAll<HTMLElement>("input, select, button, [href], [tabindex]:not([tabindex='-1'])")].filter((item) => !item.hasAttribute("disabled"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => { document.removeEventListener("keydown", handleKeyDown); previous?.focus(); };
+  }, [onClose]);
+
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
       <section
+        ref={dialogRef}
         className={`modal ${wide ? "modal-wide" : ""}`}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={titleId}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="modal-head">
-          <h2>{title}</h2>
-          <button className="icon-button" onClick={onClose} aria-label="关闭">
+          <h2 id={titleId}>{title}</h2>
+          <button type="button" className="icon-button" onClick={onClose} aria-label="关闭">
             <X size={18} />
           </button>
         </div>
@@ -81,15 +107,15 @@ export function Empty({ children }: { children: ReactNode }) {
 
 export function Loading() {
   return (
-    <div className="loading-screen">
-      <span className="spinner" />
+    <div className="loading-screen" role="status" aria-live="polite">
+      <span className="spinner" aria-hidden="true" />
       <p>正在加载安全控制台…</p>
     </div>
   );
 }
 
 export function InlineError({ message }: { message: string }) {
-  return <div className="inline-error">{message}</div>;
+  return <div className="inline-error" role="alert">{message}</div>;
 }
 
 export function Meter({ value, max }: { value: number; max: number }) {

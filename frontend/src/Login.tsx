@@ -32,15 +32,16 @@ export function Login({ onLogin }: { onLogin: (session: Session) => void }) {
       <section className="login-brand">
         <div className="brand-mark"><KeyRound size={28} /></div>
         <div>
-          <p className="eyebrow">PRIVATE MODEL GATEWAY</p>
           <h1>Token Station</h1>
           <p>真实上游密钥只留在服务端。为每位用户分配独立凭证、额度和模型权限。</p>
+        </div>
+        <div className="login-schematic" aria-label="安全访问链路">
+          <span>上游凭证</span><i /><span>模型权限</span><i /><span>中转 Key</span>
         </div>
         <div className="trust-line"><ShieldCheck size={17} /> AES-256-GCM · 服务端 Session · 不记录对话正文</div>
       </section>
       <form className="login-card" onSubmit={submit}>
         <div>
-          <p className="eyebrow">安全入口</p>
           <h2>登录控制台</h2>
           <p className="muted">账号由管理员创建，不开放公开注册。</p>
         </div>
@@ -82,7 +83,6 @@ export function PasswordGate({ session, onChanged }: { session: Session; onChang
     <main className="center-shell">
       <form className="password-card" onSubmit={submit}>
         <div className="brand-mark"><ShieldCheck size={26} /></div>
-        <p className="eyebrow">首次登录保护</p>
         <h1>请先设置新密码</h1>
         <p className="muted">你好，{session.user.display_name}。新密码至少 12 位，并包含三类字符。</p>
         <Field label="当前临时密码" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} required />

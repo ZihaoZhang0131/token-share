@@ -88,3 +88,13 @@ export interface DashboardStats {
   providers: number;
   models: number;
 }
+
+export interface AuditLog {
+  id: string;
+  actor_user_id: string;
+  action: string;
+  target_type: string;
+  target_id: string;
+  metadata_json: Record<string, unknown>;
+  created_at: string;
+}

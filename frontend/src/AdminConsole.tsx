@@ -5,28 +5,28 @@ import {
   CheckCircle2,
   CircleGauge,
   Database,
+  FileSearch,
   Plus,
   RefreshCw,
+  Route,
   ScrollText,
+  ShieldCheck,
   Users
 } from "lucide-react";
 import { api, formatDate, formatNumber } from "./api";
 import { Button, Empty, Field, InlineError, Modal, SelectField } from "./components";
-import type { DashboardStats, ModelRoute, Provider, UsageLog, User } from "./types";
+import type { AuditLog, DashboardStats, ModelRoute, Provider, UsageLog, User } from "./types";
 
-type Tab = "overview" | "providers" | "models" | "users" | "logs";
+type Tab = "overview" | "providers" | "models" | "users" | "logs" | "audit";
 
 const tabs: { id: Tab; label: string; icon: typeof Activity }[] = [
   { id: "overview", label: "总览", icon: CircleGauge },
   { id: "providers", label: "上游", icon: Database },
   { id: "models", label: "模型", icon: Boxes },
   { id: "users", label: "用户", icon: Users },
-  { id: "logs", label: "调用日志", icon: ScrollText }
+  { id: "logs", label: "调用日志", icon: ScrollText },
+  { id: "audit", label: "审计日志", icon: FileSearch }
 ];
-
-function Stat({ label, value, note }: { label: string; value: string; note: string }) {
-  return <article className="stat-card"><span>{label}</span><strong>{value}</strong><small>{note}</small></article>;
-}
 
 export default function AdminConsole() {
   const [tab, setTab] = useState<Tab>("overview");
@@ -35,6 +35,7 @@ export default function AdminConsole() {
   const [models, setModels] = useState<ModelRoute[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [logs, setLogs] = useState<UsageLog[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [error, setError] = useState("");
   const [modal, setModal] = useState<"provider" | "model" | "user" | null>(null);
   const [resetUser, setResetUser] = useState<User | null>(null);
@@ -45,18 +46,20 @@ export default function AdminConsole() {
   const loadAll = useCallback(async () => {
     setError("");
     try {
-      const [nextStats, nextProviders, nextModels, nextUsers, nextLogs] = await Promise.all([
+      const [nextStats, nextProviders, nextModels, nextUsers, nextLogs, nextAuditLogs] = await Promise.all([
         api<DashboardStats>("/api/admin/dashboard"),
         api<Provider[]>("/api/admin/providers"),
         api<ModelRoute[]>("/api/admin/models"),
         api<User[]>("/api/admin/users"),
-        api<UsageLog[]>("/api/admin/logs?limit=200")
+        api<UsageLog[]>("/api/admin/logs?limit=200"),
+        api<AuditLog[]>("/api/admin/audit?limit=200")
       ]);
       setStats(nextStats);
       setProviders(nextProviders);
       setModels(nextModels);
       setUsers(nextUsers);
       setLogs(nextLogs);
+      setAuditLogs(nextAuditLogs);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "加载失败");
     }
@@ -68,25 +71,33 @@ export default function AdminConsole() {
     <div className="console-layout">
       <aside className="side-nav">
         <div><p className="nav-caption">管理控制台</p>{tabs.map(({ id, label, icon: Icon }) => (
-          <button className={tab === id ? "active" : ""} key={id} onClick={() => setTab(id)}><Icon size={17} />{label}</button>
+          <button className={tab === id ? "active" : ""} key={id} onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined}><Icon size={17} />{label}</button>
         ))}</div>
         <div className="security-note"><CheckCircle2 size={17} /><span><strong>密钥保护已启用</strong><small>真实 Key 不会返回浏览器</small></span></div>
       </aside>
       <main className="workspace">
-        <div className="page-head">
-          <div><p className="eyebrow">ADMIN</p><h1>{tabs.find((item) => item.id === tab)?.label}</h1></div>
+        <div className="admin-instrument-header">
+          <div className="instrument-title"><h1>{tabs.find((item) => item.id === tab)?.label}</h1><p>管理访问链路、额度与运行状态</p></div>
+          <div className="instrument-readouts" aria-label="系统读数">
+            <span><small>30D REQUESTS</small><strong>{stats ? formatNumber(stats.requests) : "—"}</strong></span>
+            <span><small>MODELS</small><strong>{stats ? formatNumber(stats.models) : "—"}</strong></span>
+            <span><small>USERS</small><strong>{stats ? formatNumber(stats.users) : "—"}</strong></span>
+          </div>
           <div className="page-actions"><Button variant="secondary" onClick={loadAll}><RefreshCw size={15} />刷新</Button>
+            {tab === "overview" && <Button variant="secondary" onClick={() => setTab("logs")}><ScrollText size={15} />查看日志</Button>}
+            {tab === "overview" && <Button onClick={() => setModal("provider")}><Plus size={16} />新增上游</Button>}
             {tab === "providers" && <Button onClick={() => setModal("provider")}><Plus size={16} />新增上游</Button>}
             {tab === "models" && <Button onClick={() => setModal("model")} disabled={!providers.length}><Plus size={16} />新增模型</Button>}
             {tab === "users" && <Button onClick={() => setModal("user")}><Plus size={16} />新增用户</Button>}
           </div>
         </div>
         {error && <InlineError message={error} />}
-        {tab === "overview" && <Overview stats={stats} logs={logs} />}
+        {tab === "overview" && <Overview stats={stats} logs={logs} providers={providers} models={models} users={users} />}
         {tab === "providers" && <Providers providers={providers} onChanged={loadAll} onEdit={setEditProvider} />}
         {tab === "models" && <Models models={models} providers={providers} onChanged={loadAll} onEdit={setEditModel} />}
         {tab === "users" && <UsersView users={users} models={models} onChanged={loadAll} onReset={setResetUser} onEdit={setEditUser} />}
         {tab === "logs" && <Logs logs={logs} users={users} />}
+        {tab === "audit" && <AuditLogs logs={auditLogs} users={users} />}
       </main>
       {modal === "provider" && <ProviderForm onClose={() => setModal(null)} onSaved={async () => { setModal(null); await loadAll(); }} />}
       {modal === "model" && <ModelForm providers={providers} onClose={() => setModal(null)} onSaved={async () => { setModal(null); await loadAll(); }} />}
@@ -99,20 +110,93 @@ export default function AdminConsole() {
   );
 }
 
-function Overview({ stats, logs }: { stats: DashboardStats | null; logs: UsageLog[] }) {
+function Overview({ stats, logs, providers, models, users }: { stats: DashboardStats | null; logs: UsageLog[]; providers: Provider[]; models: ModelRoute[]; users: User[] }) {
   if (!stats) return <div className="skeleton-grid"><div /><div /><div /><div /></div>;
   return <>
-    <section className="stats-grid">
-      <Stat label="近 30 天请求" value={formatNumber(stats.requests)} note={`${stats.users} 位用户`} />
-      <Stat label="Token 消耗" value={formatNumber(stats.tokens)} note="仅统计模型用量" />
-      <Stat label="成功率" value={`${stats.success_rate}%`} note={`平均 ${formatNumber(stats.avg_latency_ms)} ms`} />
-      <Stat label="可用资源" value={`${stats.models} 个模型`} note={`${stats.providers} 个上游`} />
+    <AccessCircuit stats={stats} logs={logs} providers={providers} models={models} users={users} />
+    <section className="panel operations-panel">
+      <div className="panel-head"><div><h2>上游状态</h2><p>凭证边界与连接参数；健康度以启用状态和真实调用结果为准</p></div><Database size={20} /></div>
+      <ProviderLedger providers={providers} logs={logs} models={models} />
     </section>
     <section className="panel">
       <div className="panel-head"><div><h2>最近调用</h2><p>仅展示元数据，不保存输入和回答正文</p></div><Activity size={20} /></div>
       <LogTable logs={logs.slice(0, 8)} />
     </section>
   </>;
+}
+
+function AccessCircuit({ stats, logs, providers, models, users }: { stats: DashboardStats; logs: UsageLog[]; providers: Provider[]; models: ModelRoute[]; users: User[] }) {
+  const activeProviders = providers.filter((provider) => provider.active).length;
+  const activeModels = models.filter((model) => model.active).length;
+  const ordinaryUsers = users.filter((user) => user.role === "user");
+  const activeUsers = ordinaryUsers.filter((user) => user.active).length;
+  const hasRecentFault = logs.slice(0, 20).some((log) => log.status_code >= 400);
+  const providerName = (id: string) => providers.find((provider) => provider.id === id)?.name ?? "未接通上游";
+  const stateClass = (state: "live" | "warn" | "fault") => `state-${state}`;
+
+  return <section className="access-circuit" aria-labelledby="access-circuit-title">
+    <div className="circuit-head">
+      <div><h2 id="access-circuit-title">访问链路</h2><p>上游凭证 → 公开模型 → 配额校验 → 用户权限</p></div>
+      <div className="circuit-legend"><span><i className="legend-live" />通路</span><span><i className="legend-warn" />降级 / 待配置</span><span><i className="legend-fault" />阻断</span></div>
+    </div>
+    <div className="single-line-board">
+      <svg className="single-line-svg" viewBox="0 0 1400 310" preserveAspectRatio="none" aria-hidden="true">
+        <path className="line-live" d="M38 150 H1362" />
+        <path className="line-branch" d="M405 150 V52 H665 M405 150 V254 H665" />
+        <path className={hasRecentFault ? "line-fault" : "line-live"} d="M880 150 H1030" />
+        <circle className="line-node-dot" cx="38" cy="150" r="7" />
+        <circle className="line-node-dot" cx="405" cy="150" r="7" />
+        <circle className="line-node-dot" cx="880" cy="150" r="7" />
+        <circle className="line-node-dot" cx="1362" cy="150" r="7" />
+      </svg>
+      <div className="single-line-nodes">
+        <article className={`line-node source-node ${stateClass(activeProviders ? "live" : "warn")}`}>
+          <div className="node-symbol"><Database size={22} /></div>
+          <div className="node-copy"><span>上游服务</span><strong>{providers.length ? `${activeProviders} / ${providers.length}` : "待配置"}</strong><small>加密凭证 · 公网 HTTPS</small></div>
+          <i className="state-lamp" aria-label={activeProviders ? "通路" : "待配置"} />
+        </article>
+
+        <div className={`line-node breaker-node ${stateClass(activeProviders ? "live" : "warn")}`}>
+          <span>凭证断路器</span><i className="breaker-symbol" aria-hidden="true" /><small>{activeProviders ? "闭合" : "断开"}</small>
+        </div>
+
+        <article className={`line-node mapping-node ${stateClass(activeModels ? "live" : "warn")}`}>
+          <div className="mapping-title"><Boxes size={18} /><span>公开模型路由</span><strong>{activeModels} / {models.length}</strong></div>
+          <div className="mapping-lines">
+            {models.slice(0, 3).map((model) => <div key={model.id}><code>{model.public_name}</code><i /><small>{providerName(model.provider_id)}</small></div>)}
+            {!models.length && <div className="mapping-empty"><code>等待模型映射</code><i /><small>未接通上游</small></div>}
+          </div>
+        </article>
+
+        <div className={`line-node breaker-node ${stateClass(hasRecentFault ? "fault" : "live")}`}>
+          <span>配额断路器</span><i className="breaker-symbol" aria-hidden="true" /><small>{hasRecentFault ? "最近有阻断" : "逐次校验"}</small>
+        </div>
+
+        <article className={`line-node endpoint-node ${stateClass(activeModels ? "live" : "warn")}`}>
+          <div className="node-symbol"><Route size={22} /></div>
+          <div className="node-copy"><span>统一出口</span><strong>/v1/*</strong><small>公开别名 · 标准协议</small></div>
+          <i className="state-lamp" aria-label={activeModels ? "通路" : "待配置"} />
+        </article>
+
+        <div className={`line-node breaker-node ${stateClass(activeUsers ? "live" : "warn")}`}>
+          <span>授权断路器</span><i className="breaker-symbol" aria-hidden="true" /><small>{activeUsers ? "闭合" : "断开"}</small>
+        </div>
+
+        <article className={`line-node user-node ${stateClass(activeUsers ? "live" : "warn")}`}>
+          <div className="node-symbol"><ShieldCheck size={22} /></div>
+          <div className="node-copy"><span>用户权限</span><strong>{ordinaryUsers.length ? `${activeUsers} / ${ordinaryUsers.length}` : "待配置"}</strong><small>独立 Key · 模型授权</small></div>
+          <i className="state-lamp" aria-label={activeUsers ? "通路" : "待配置"} />
+        </article>
+      </div>
+    </div>
+    <div className="telemetry-strip" aria-label="控制面遥测">
+      <span><small>UPSTREAM</small><strong>{activeProviders}/{providers.length}</strong></span>
+      <span><small>ROUTES</small><strong>{activeModels}/{models.length}</strong></span>
+      <span><small>USERS</small><strong>{activeUsers}/{ordinaryUsers.length}</strong></span>
+      <span><small>30D REQUESTS</small><strong>{formatNumber(stats.requests)}</strong></span>
+      <span><small>LOG MODE</small><strong>仅元数据</strong></span>
+    </div>
+  </section>;
 }
 
 function Providers({ providers, onChanged, onEdit }: { providers: Provider[]; onChanged: () => Promise<void>; onEdit: (provider: Provider) => void }) {
@@ -167,8 +251,26 @@ function Logs({ logs, users }: { logs: UsageLog[]; users: User[] }) {
 }
 
 function LogTable({ logs }: { logs: UsageLog[] }) {
-  if (!logs.length) return <Empty>完成第一次模型调用后，这里会显示元数据。</Empty>;
-  return <div className="compact-log">{logs.map((log) => <div key={log.request_id}><span className={`status-dot ${log.status_code < 400 ? "ok" : "bad"}`} /><strong>{log.model_alias}</strong><code>{log.request_id.slice(0, 14)}</code><span>{formatNumber(log.total_tokens)} tokens</span><time>{formatDate(log.created_at)}</time></div>)}</div>;
+  return <div className="overview-ledger" role="table" aria-label="最近调用元数据">
+    <div className="ledger-row ledger-header" role="row"><span>状态</span><span>公开模型</span><span>请求 ID</span><span>Token</span><span>耗时</span><span>时间</span></div>
+    {logs.length ? logs.map((log) => <div className="ledger-row" role="row" key={log.request_id}><span><i className={`status-dot ${log.status_code < 400 ? "ok" : "bad"}`} />{log.status_code}</span><strong>{log.model_alias}</strong><code>{log.request_id.slice(0, 14)}</code><span>{formatNumber(log.total_tokens)}</span><span>{formatNumber(log.latency_ms)} ms</span><time>{formatDate(log.created_at)}</time></div>) : <div className="ledger-row ledger-empty" role="row"><span><i className="status-dot off" />—</span><strong>尚无调用</strong><code>—</code><span>—</span><span>—</span><time>完成第一次模型调用后显示</time></div>}
+  </div>;
+}
+
+function ProviderLedger({ providers, logs, models }: { providers: Provider[]; logs: UsageLog[]; models: ModelRoute[] }) {
+  return <div className="provider-ledger" role="table" aria-label="上游运行状态">
+    <div className="provider-ledger-row provider-ledger-header" role="row"><span>上游</span><span>Base URL</span><span>公开路由</span><span>超时</span><span>Usage</span><span>状态</span></div>
+    {providers.length ? providers.map((provider) => {
+      const routes = models.filter((model) => model.provider_id === provider.id && model.active).length;
+      const hasFault = logs.slice(0, 20).some((log) => log.status_code >= 500 && models.some((model) => model.provider_id === provider.id && model.public_name === log.model_alias));
+      return <div className="provider-ledger-row" role="row" key={provider.id}><strong>{provider.name}</strong><code>{provider.base_url}</code><span>{routes}</span><span>{provider.timeout_seconds}s</span><span>{provider.supports_stream_usage ? "上游返回" : "本地估算"}</span><span><i className={`status-dot ${hasFault ? "bad" : provider.active ? "ok" : "off"}`} />{hasFault ? "近期故障" : provider.active ? "启用" : "停用"}</span></div>;
+    }) : <div className="provider-ledger-row provider-ledger-empty" role="row"><strong>尚无上游</strong><code>—</code><span>0</span><span>—</span><span>—</span><span><i className="status-dot off" />待配置</span></div>}
+  </div>;
+}
+
+function AuditLogs({ logs, users }: { logs: AuditLog[]; users: User[] }) {
+  const actorName = (id: string) => users.find((user) => user.id === id)?.display_name ?? id.slice(0, 8);
+  return <section className="panel table-panel"><table><thead><tr><th>时间</th><th>操作者</th><th>动作</th><th>对象类型</th><th>对象 ID</th><th>元数据</th></tr></thead><tbody>{logs.map((log) => <tr key={log.id}><td>{formatDate(log.created_at)}</td><td>{actorName(log.actor_user_id)}</td><td><code>{log.action}</code></td><td>{log.target_type}</td><td><code>{log.target_id.slice(0, 16)}</code></td><td><code>{Object.keys(log.metadata_json).join("、") || "—"}</code></td></tr>)}</tbody></table>{!logs.length && <Empty>尚无审计记录</Empty>}</section>;
 }
 
 function ProviderForm({ provider, onClose, onSaved }: { provider?: Provider; onClose: () => void; onSaved: () => Promise<void> }) {

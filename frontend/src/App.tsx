@@ -42,9 +42,12 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="topbar-brand"><span><KeyRound size={18} /></span><strong>Token Station</strong></div>
+        <div className="topbar-brand">
+          <span><KeyRound size={18} /></span>
+          <div><strong>Token Station</strong><small>安全访问控制面</small></div>
+        </div>
         <div className="topbar-user">
-          <div><strong>{session.user.display_name}</strong><small>{session.user.role === "admin" ? "管理员" : session.user.email}</small></div>
+          <div><strong>{session.user.display_name}</strong><small>{session.user.role === "admin" ? "管理员 · 全局控制" : session.user.email}</small></div>
           <Button variant="ghost" onClick={logout}><LogOut size={16} />退出</Button>
         </div>
       </header>
