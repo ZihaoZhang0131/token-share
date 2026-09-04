@@ -1,14 +1,16 @@
 import { useState, type FormEvent } from "react";
-import { KeyRound, ShieldCheck } from "lucide-react";
+import { KeyRound, LogIn, ShieldCheck } from "lucide-react";
 import { api } from "./api";
-import { Button, Field, InlineError } from "./components";
+import { Button, Field, InlineError, Modal } from "./components";
 import type { Session } from "./types";
+import UserConsole from "./UserConsole";
 
 export function Login({ onLogin }: { onLogin: (session: Session) => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -27,30 +29,42 @@ export function Login({ onLogin }: { onLogin: (session: Session) => void }) {
     }
   }
 
+  const openLogin = () => {
+    setError("");
+    setLoginOpen(true);
+  };
+
   return (
-    <main className="login-shell">
-      <section className="login-brand">
-        <div className="brand-mark"><KeyRound size={28} /></div>
-        <div>
-          <h1>Token Station</h1>
-          <p>真实上游密钥只留在服务端。为每位用户分配独立凭证、额度和模型权限。</p>
+    <div className="app-shell guest-shell">
+      <header className="topbar">
+        <div className="topbar-brand">
+          <span><KeyRound size={18} /></span>
+          <div><strong>Token Station</strong><small>安全访问控制面</small></div>
         </div>
-        <div className="login-schematic" aria-label="安全访问链路">
-          <span>上游凭证</span><i /><span>模型权限</span><i /><span>中转 Key</span>
+        <div className="topbar-user">
+          <div><strong>访客</strong><small>未登录</small></div>
+          <Button variant="ghost" onClick={openLogin}><LogIn size={16} />登录</Button>
         </div>
-        <div className="trust-line"><ShieldCheck size={17} /> AES-256-GCM · 服务端 Session · 不记录对话正文</div>
-      </section>
-      <form className="login-card" onSubmit={submit}>
-        <div>
-          <h2>登录控制台</h2>
-          <p className="muted">账号由管理员创建，不开放公开注册。</p>
-        </div>
-        <Field label="邮箱" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <Field label="密码" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        {error && <InlineError message={error} />}
-        <Button type="submit" disabled={busy}>{busy ? "正在验证…" : "登录"}</Button>
-      </form>
-    </main>
+      </header>
+
+      <UserConsole session={null} onLoginRequired={openLogin} />
+
+      {loginOpen && (
+        <Modal title="登录控制台" onClose={() => setLoginOpen(false)}>
+          <form className="modal-form guest-login-form" onSubmit={submit}>
+            <p className="guest-login-intro">账号由管理员创建，不开放公开注册。</p>
+            <Field label="邮箱" type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} required />
+            <Field label="密码" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+            {error && <InlineError message={error} />}
+            <div className="login-boundary"><ShieldCheck size={16} />登录后加载你的真实额度、模型权限与访问 Key。</div>
+            <div className="modal-actions">
+              <Button type="button" variant="secondary" onClick={() => setLoginOpen(false)}>取消</Button>
+              <Button type="submit" disabled={busy}>{busy ? "正在验证…" : "登录"}</Button>
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
   );
 }
 

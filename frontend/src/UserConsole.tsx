@@ -6,7 +6,13 @@ import type { AccessKey, ModelRoute, Session, Usage } from "./types";
 
 type Tab = "usage" | "keys" | "guide";
 
-export default function UserConsole({ session }: { session: Session }) {
+export default function UserConsole({
+  session,
+  onLoginRequired
+}: {
+  session: Session | null;
+  onLoginRequired?: () => void;
+}) {
   const [tab, setTab] = useState<Tab>("usage");
   const [usage, setUsage] = useState<Usage | null>(null);
   const [keys, setKeys] = useState<AccessKey[]>([]);
@@ -14,8 +20,16 @@ export default function UserConsole({ session }: { session: Session }) {
   const [error, setError] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [newSecret, setNewSecret] = useState("");
+  const isGuest = session === null;
 
   const load = useCallback(async () => {
+    if (!session) {
+      setUsage(null);
+      setKeys([]);
+      setModels([]);
+      setError("");
+      return;
+    }
     setError("");
     try {
       const [nextUsage, nextKeys, nextModels] = await Promise.all([
@@ -23,11 +37,12 @@ export default function UserConsole({ session }: { session: Session }) {
       ]);
       setUsage(nextUsage); setKeys(nextKeys); setModels(nextModels);
     } catch (reason) { setError(reason instanceof Error ? reason.message : "加载失败"); }
-  }, []);
+  }, [session]);
 
   useEffect(() => { void load(); }, [load]);
 
   async function revoke(key: AccessKey) {
+    if (!session) return onLoginRequired?.();
     if (!window.confirm(`确认撤销“${key.name}”？使用它的客户端会立即失效。`)) return;
     await api(`/api/me/keys/${key.id}`, { method: "DELETE" });
     await load();
@@ -39,30 +54,38 @@ export default function UserConsole({ session }: { session: Session }) {
       <button className={tab === "keys" ? "active" : ""} onClick={() => setTab("keys")} aria-current={tab === "keys" ? "page" : undefined}><KeyRound size={17} />访问 Key</button>
       <button className={tab === "guide" ? "active" : ""} onClick={() => setTab("guide")} aria-current={tab === "guide" ? "page" : undefined}><BookOpen size={17} />接入指南</button>
     </div><div className="security-note"><ShieldCheck size={17} /><span><strong>隐私模式</strong><small>不保存提示词和回答正文</small></span></div></aside>
-    <main className="workspace"><div className="page-head"><div><h1>{tab === "usage" ? "本月用量" : tab === "keys" ? "访问 Key" : "接入指南"}</h1><p className="page-subtitle">{session.user.email}</p></div>{tab === "keys" && <Button onClick={() => setCreateOpen(true)} disabled={keys.filter((key) => key.active).length >= 5}><Plus size={16} />创建 Key</Button>}</div>
+    <main className="workspace"><div className="page-head"><div><h1>{tab === "usage" ? "本月用量" : tab === "keys" ? "访问 Key" : "接入指南"}</h1><p className="page-subtitle">{session?.user.email ?? "未登录 · 数据尚未加载"}</p></div>{tab === "keys" && <Button onClick={session ? () => setCreateOpen(true) : onLoginRequired} disabled={Boolean(session) && keys.filter((key) => key.active).length >= 5}><Plus size={16} />{session ? "创建 Key" : "登录后创建"}</Button>}</div>
+      {isGuest && <section className="guest-notice"><div><strong>你正在使用未登录视图</strong><p>这是实际控制台。登录后会在这里加载你的真实额度、模型权限与访问 Key。</p></div><Button variant="secondary" onClick={onLoginRequired}>登录加载数据</Button></section>}
       {error && <InlineError message={error} />}
-      {tab === "usage" && <UsageView usage={usage} models={models} />}
-      {tab === "keys" && <KeysView keys={keys} onRevoke={revoke} />}
+      {tab === "usage" && <UsageView usage={usage} models={models} guest={isGuest} />}
+      {tab === "keys" && <KeysView keys={keys} onRevoke={revoke} guest={isGuest} onLoginRequired={onLoginRequired} />}
       {tab === "guide" && <Guide models={models} />}
     </main>
-    {createOpen && <CreateKey rpmLimit={session.user.rpm_limit} tpmLimit={session.user.tpm_limit} onClose={() => setCreateOpen(false)} onCreated={async (secret) => { setCreateOpen(false); setNewSecret(secret); await load(); }} />}
+    {session && createOpen && <CreateKey rpmLimit={session.user.rpm_limit} tpmLimit={session.user.tpm_limit} onClose={() => setCreateOpen(false)} onCreated={async (secret) => { setCreateOpen(false); setNewSecret(secret); await load(); }} />}
     {newSecret && <SecretModal secret={newSecret} onClose={() => setNewSecret("")} />}
   </div>;
 }
 
-function UsageView({ usage, models }: { usage: Usage | null; models: ModelRoute[] }) {
+function UsageView({ usage, models, guest = false }: { usage: Usage | null; models: ModelRoute[]; guest?: boolean }) {
   const maxDay = useMemo(() => Math.max(1, ...(usage?.daily.map((item) => item.tokens) ?? [1])), [usage]);
+  const usedPercent = usage && usage.monthly_token_limit > 0 ? (usage.used_tokens / usage.monthly_token_limit) * 100 : 0;
+  if (guest) return <>
+    <section className="usage-hero guest-usage"><div><span>本月已使用</span><strong>—</strong><small>剩余额度 —</small></div><div className="usage-meter"><Meter value={0} max={1} /><span>— / —</span></div></section>
+    <section className="stats-grid three"><article className="stat-card"><span>请求数</span><strong>0</strong><small>登录后显示</small></article><article className="stat-card"><span>输入 Token</span><strong>0</strong><small>登录后显示</small></article><article className="stat-card"><span>输出 Token</span><strong>0</strong><small>登录后显示</small></article></section>
+    <section className="panel"><div className="panel-head"><div><h2>每日 Token</h2><p>按北京时间统计</p></div></div><Empty>登录后显示每日用量</Empty></section>
+    <section className="panel"><div className="panel-head"><div><h2>允许使用的模型</h2><p>模型权限由管理员分配</p></div></div><Empty>登录后显示可用模型</Empty></section>
+  </>;
   if (!usage) return <div className="skeleton-grid"><div /><div /><div /></div>;
   return <>
-    <section className="usage-hero"><div><span>{usage.month} 已使用</span><strong>{formatNumber(usage.used_tokens)}</strong><small>剩余 {formatNumber(usage.remaining_tokens)} Token</small></div><div className="usage-meter"><Meter value={usage.used_tokens} max={usage.monthly_token_limit} /><span>{((usage.used_tokens / usage.monthly_token_limit) * 100).toFixed(1)}% / {formatNumber(usage.monthly_token_limit)}</span></div></section>
+    <section className="usage-hero"><div><span>{usage.month} 已使用</span><strong>{formatNumber(usage.used_tokens)}</strong><small>剩余 {formatNumber(usage.remaining_tokens)} Token</small></div><div className="usage-meter"><Meter value={usage.used_tokens} max={usage.monthly_token_limit} /><span>{usedPercent.toFixed(1)}% / {formatNumber(usage.monthly_token_limit)}</span></div></section>
     <section className="stats-grid three"><article className="stat-card"><span>请求数</span><strong>{formatNumber(usage.request_count)}</strong><small>本自然月</small></article><article className="stat-card"><span>输入 Token</span><strong>{formatNumber(usage.input_tokens)}</strong><small>提示词及上下文</small></article><article className="stat-card"><span>输出 Token</span><strong>{formatNumber(usage.output_tokens)}</strong><small>模型生成内容</small></article></section>
     <section className="panel"><div className="panel-head"><div><h2>每日 Token</h2><p>按北京时间统计</p></div></div><div className="bar-chart">{usage.daily.map((item, index) => <div className="bar-slot" key={item.date} title={`${item.date}: ${item.tokens}`}><span style={{ height: `${Math.max(item.tokens ? 6 : 1, (item.tokens / maxDay) * 100)}%` }} /><small>{index % 5 === 0 || index === usage.daily.length - 1 ? item.date : ""}</small></div>)}</div></section>
     <section className="panel"><div className="panel-head"><div><h2>允许使用的模型</h2><p>模型权限由管理员分配</p></div></div><div className="model-chips">{models.map((model) => <code key={model.id}>{model.public_name}</code>)}{!models.length && <Empty>尚未分配模型</Empty>}</div></section>
   </>;
 }
 
-function KeysView({ keys, onRevoke }: { keys: AccessKey[]; onRevoke: (key: AccessKey) => void }) {
-  if (!keys.length) return <Empty>还没有访问 Key。创建后，明文只会显示一次。</Empty>;
+function KeysView({ keys, onRevoke, guest = false, onLoginRequired }: { keys: AccessKey[]; onRevoke: (key: AccessKey) => void; guest?: boolean; onLoginRequired?: () => void }) {
+  if (!keys.length) return <Empty>{guest ? <div className="guest-empty"><strong>尚未加载访问 Key</strong><span>登录后可查看、创建或撤销你的 Key。</span><Button onClick={onLoginRequired}>登录查看</Button></div> : "还没有访问 Key。创建后，明文只会显示一次。"}</Empty>;
   return <div className="key-list">{keys.map((key) => <article className={`key-row ${key.active ? "" : "disabled"}`} key={key.id}><div className="key-icon"><KeyRound size={19} /></div><div className="key-main"><div><strong>{key.name}</strong><span className={`pill ${key.active ? "pill-ok" : ""}`}>{key.active ? "有效" : "已撤销"}</span></div><code>ts_sk_{key.prefix}_••••{key.last4}</code><small>创建 {formatDate(key.created_at)} · 最近使用 {formatDate(key.last_used_at)}</small></div><dl><div><dt>RPM</dt><dd>{formatNumber(key.rpm_limit)}</dd></div><div><dt>TPM</dt><dd>{formatNumber(key.tpm_limit)}</dd></div></dl>{key.active && <Button variant="ghost" onClick={() => onRevoke(key)} aria-label={`撤销 ${key.name}`}><Trash2 size={16} />撤销</Button>}</article>)}</div>;
 }
 

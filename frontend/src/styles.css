@@ -1,25 +1,25 @@
 :root {
   font-family: "Avenir Next", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
-  color: #012445;
-  background: #f8f7f1;
+  color: #111827;
+  background: #f4f7f6;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink: #012445;
-  --ink-soft: #36556a;
-  --muted: #5e7280;
-  --ground: #f8f7f1;
-  --ground-deep: #f0efe9;
-  --panel: #fcfbf7;
-  --line: #c1ccd3;
-  --line-soft: #dce2e3;
-  --circuit: #095294;
-  --circuit-dark: #073e70;
-  --circuit-soft: #e7eff5;
+  --ink: #111827;
+  --ink-soft: #354152;
+  --muted: #667085;
+  --ground: #f4f7f6;
+  --ground-deep: #eaf0ee;
+  --panel: #ffffff;
+  --line: #cdd8d5;
+  --line-soft: #e3e9e7;
+  --circuit: #087f68;
+  --circuit-dark: #056653;
+  --circuit-soft: #e3f4ef;
   --ok: #237354;
   --warn: #b66516;
   --warn-bright: #d67d21;
   --fault: #b63832;
-  --focus: #0c6db7;
+  --focus: #087f68;
   --mono: "SFMono-Regular", "Roboto Mono", Consolas, "Liberation Mono", monospace;
   --display: "DIN Alternate", "Avenir Next Condensed", "Arial Narrow", sans-serif;
 }
@@ -490,4 +490,86 @@ td code { padding: 3px 5px; color: var(--circuit-dark); background: var(--circui
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Console polish: same product, calmer contemporary controls. */
+.button { min-height: 40px; border-radius: 10px; }
+.brand-mark,
+.topbar-brand > span,
+.side-nav button,
+.field input,
+.field select,
+select,
+.icon-button,
+.check-field,
+.model-picker,
+.model-picker label { border-radius: 10px; }
+.topbar { background: #fff; border-bottom-color: var(--line-soft); }
+.topbar-brand > span { background: var(--circuit); }
+.side-nav { background: #edf2f0; border-right-color: var(--line-soft); }
+.side-nav button.active { background: var(--ink); border-color: var(--ink); }
+.admin-instrument-header,
+.access-circuit,
+.stats-grid,
+.panel,
+.resource-card,
+.key-row,
+.usage-hero,
+.code-card { border-radius: 14px; }
+.admin-instrument-header,
+.access-circuit,
+.usage-hero { border-color: var(--line); }
+.resource-card,
+.key-row,
+.panel { transition: border-color 160ms ease-out, box-shadow 160ms ease-out; }
+.resource-card:hover,
+.key-row:hover { border-color: #aabbb6; box-shadow: 0 12px 28px rgba(17,24,39,.07); }
+.pill { border-radius: 999px; }
+.modal { border-radius: 16px; border-color: var(--line); box-shadow: 0 28px 80px rgba(17,24,39,.18); }
+.password-card { border-radius: 16px; border-color: var(--line); box-shadow: 0 24px 70px rgba(17,24,39,.09); }
+
+/* Guest state uses the real console shell; authentication unlocks data and actions. */
+.guest-notice {
+  min-height: 66px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  color: var(--ink);
+  background: var(--circuit-soft);
+  border: 1px solid #bfd8d0;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.guest-notice > div { min-width: 0; }
+.guest-notice strong { display: block; margin-bottom: 4px; font-size: 13px; }
+.guest-notice p { margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
+.guest-notice .button { flex: 0 0 auto; background: #fff; }
+.guest-usage strong { color: var(--muted); }
+.guest-empty { min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.guest-empty strong { color: var(--ink); font-size: 14px; }
+.guest-empty span { color: var(--muted); font-size: 12px; }
+.guest-empty .button { margin-top: 8px; }
+.guest-login-form { display: flex; flex-direction: column; gap: 15px; }
+.guest-login-intro { margin: 0 0 4px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.login-boundary {
+  padding: 10px 12px;
+  color: var(--ink-soft);
+  background: var(--ground-deep);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.login-boundary svg { flex: 0 0 auto; color: var(--ok); }
+
+@media (max-width: 760px) {
+  .guest-notice { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 420px) {
+  .guest-notice .button { width: 100%; }
 }
