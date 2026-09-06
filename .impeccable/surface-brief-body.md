@@ -2,41 +2,41 @@
 
 - Scope: `frontend/src/App.tsx`, login/password gates, administrator console, user console, shared components and styles.
 - Visitor mode: Operate.
-- Primary audience/job: administrators configure and supervise the complete access chain; ordinary users inspect quota, create/revoke keys and reach a successful first API call.
-- Required action and content: preserve every existing feature, API call, field, role boundary and security warning; make current state, dependency order and next action easier to scan.
-- Constraints: React 19 + TypeScript + native CSS + lucide-react; Chinese UI; desktop and mobile web; no fabricated claims or production data.
+- Primary audience/job: administrators configure and supervise the access chain; ordinary users inspect quota, create or revoke keys, and reach a successful first API call.
+- Required action and content: preserve every existing feature, API call, field, role boundary and security warning while making frequent operational work calm and easy to scan.
+- Constraints: React 19 + TypeScript + native CSS + lucide-react; Chinese UI; desktop and mobile web; no fabricated production data.
 
 ## Chosen direction
 
-- World: electric-utility single-line dispatch board. Upstream services, public model aliases and user permissions are one traceable supply circuit rather than independent dashboard cards.
-- Approved comp: `.impeccable/mocks/composition-horizontal.png`.
-- Memorable moment: the dashboard opens with a horizontal access circuit that makes a broken or incomplete stage visible before the user reads the ledger.
-- Signature interaction: navigation and current-path states snap into place; changing a section preserves a short, reduced-motion-safe line trace rather than using unrelated hover effects.
-- Unresolved: the repository-backed assumptions in `PRODUCT.md` remain subject to later user confirmation.
+- World: Open Ledger, a restrained graphite operations console built from one continuous canvas, whitespace and hairline rules rather than stacked cards.
+- Approved comp: `.impeccable/mocks/calm-tech-open-ledger.png`.
+- Memorable moment: the monthly quota reads as one long ledger entry whose mint meter quietly reveals capacity without becoming a hero graphic.
+- Signature interaction: the current navigation item is located by one small mint square and brighter text; the quota meter performs one short reduced-motion-safe fill on load.
+- Boundary: no Matrix code rain, scanlines, neon, gradients, glass, decorative grids, marketing hero, or fabricated values.
 
 ## Sampled visual record
 
 | Role | Sample |
 |---|---|
-| Page ground | `#F8F7F1` (dominant interior average) |
-| Control-rail ink | `#012445` |
-| Live circuit | `#095294` |
-| Warning | `#D67D21` |
-| Hairline / metal seam | `#C1CCD3` |
-| Fault | `#B63832` (direction palette; preserve for errors only) |
+| Page ground | `#0C1217` (dominant comp sample) |
+| Navigation rail | `#0D1218` |
+| Raised working surface | `#0E151A` |
+| Primary text | `#E8F0ED` (direction record) |
+| Secondary text | `#777C82` (comp sample) |
+| Mint signal | `#4BCC99` (comp sample) |
+| Hairline | `#222C2F` (comp sample) |
+| Fault | `#EF8585` (reserved for errors and destructive states) |
 
 ## Comp inventory and implementation medium
 
 | Ingredient | Comp commitment | Medium |
 |---|---|---|
-| Application chrome | 64–72px instrument header, 208px control rail, hard seams and near-square controls | Semantic HTML/CSS; lucide-react icons |
-| Access circuit | One horizontal path occupying roughly half the opening field; named upstream, breaker, mapping, quota and user-permission stages | Semantic HTML plus authored responsive inline SVG/CSS; live counts from existing props; never rasterized |
-| Status language | Cobalt live line; amber degraded; red blocked; each also has text, icon/shape and accessible label | HTML/CSS/SVG with text equivalents |
-| Operational ledger | Dense continuous rows under the circuit; compact 12–13px labels and tabular figures | Semantic tables and lists |
-| Primary actions | Integrated into the instrument strip or page head; compact rectangular switch vocabulary, 4px corner maximum | Semantic buttons with lucide-react icon; HTML/CSS |
-| Forms and modals | Same enamel ground, inset label slots, 1px seams, no floating glass card vocabulary | Semantic form/dialog HTML and CSS |
-| Type | Workhorse system Chinese sans; tabular/monospaced identifiers; approximate ramp 11/12/13/16/28/36 | CSS system stacks; no raster text |
-| Material | Smooth mineral enamel ground with faint printed registration lines; no photographic depth or texture | CSS solid fields, seams and sparse linear marks |
-| Mobile adaptation | Circuit becomes a vertical ordered sequence; navigation becomes a scrollable instrument strip; ledgers become labeled data stacks | Responsive CSS and SVG viewBox changes |
-| Motion | One circuit trace on entry/section change; controls snap; old state fades for one beat | CSS transitions/animation with `prefers-reduced-motion` fallback |
-
+| Application chrome | 64–68px top bar, narrow rail, continuous graphite canvas, low-contrast seams | Semantic HTML/CSS; lucide-react icons |
+| Navigation | Small mint square plus bright label for the current view; no filled selection block | Semantic buttons and pseudo-element marker |
+| Usage ledger | Monthly total and thin meter in one line; three counters separated by hairlines | Existing live values in semantic HTML/CSS |
+| Working regions | Chart, model permissions, tables and lists separated by spacing and rules, not a card wall | Existing semantic sections, tables and lists with flattened surface styling |
+| Primary actions | Compact mint button; secondary and ghost actions remain quiet and outlined only where needed | Semantic buttons with lucide-react icons |
+| Forms and modals | Dark fields and one elevated blocking dialog surface; clear focus and error states | Semantic form/dialog HTML and CSS |
+| Type | Chinese system sans for interface copy; monospaced figures, timestamps, keys and code only | CSS system stacks; no raster text |
+| Mobile adaptation | Rail becomes a horizontal strip; ledgers stack without losing labels; tables scroll within their region | Responsive CSS |
+| Motion | One short quota-meter fill on load; controls use restrained state transitions | CSS animation with `prefers-reduced-motion` fallback |

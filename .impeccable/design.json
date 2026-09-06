@@ -1,151 +1,121 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-18T15:37:19Z",
+  "generatedAt": "2026-09-04T18:38:53Z",
   "title": "Design System: Token Station",
   "extensions": {
     "colorMeta": {
       "ink": {
-        "role": "primary",
-        "displayName": "Control-Rail Ink",
-        "canonical": "#012445",
-        "tonalRamp": ["oklch(15% 0.073 251.0)", "oklch(25% 0.073 251.0)", "oklch(35% 0.073 251.0)", "oklch(45% 0.073 251.0)", "oklch(60% 0.073 251.0)", "oklch(72% 0.073 251.0)", "oklch(84% 0.073 251.0)", "oklch(95% 0.073 251.0)"]
+        "role": "neutral",
+        "displayName": "Soft Ledger White",
+        "canonical": "#e8f0ed",
+        "tonalRamp": ["oklch(15% 0.009 171.8)", "oklch(25% 0.009 171.8)", "oklch(35% 0.009 171.8)", "oklch(45% 0.009 171.8)", "oklch(60% 0.009 171.8)", "oklch(72% 0.009 171.8)", "oklch(84% 0.009 171.8)", "oklch(95% 0.009 171.8)"]
       },
       "ink-soft": {
         "role": "neutral",
-        "displayName": "Engraved Ink",
-        "canonical": "#36556a",
-        "tonalRamp": ["oklch(15% 0.051 239.1)", "oklch(25% 0.051 239.1)", "oklch(35% 0.051 239.1)", "oklch(45% 0.051 239.1)", "oklch(60% 0.051 239.1)", "oklch(72% 0.051 239.1)", "oklch(84% 0.051 239.1)", "oklch(95% 0.051 239.1)"]
+        "displayName": "Secondary Ledger White",
+        "canonical": "#bdc8c4",
+        "tonalRamp": ["oklch(15% 0.013 172.3)", "oklch(25% 0.013 172.3)", "oklch(35% 0.013 172.3)", "oklch(45% 0.013 172.3)", "oklch(60% 0.013 172.3)", "oklch(72% 0.013 172.3)", "oklch(84% 0.013 172.3)", "oklch(95% 0.013 172.3)"]
       },
       "muted": {
         "role": "neutral",
-        "displayName": "Muted Readout",
-        "canonical": "#5e7280",
-        "tonalRamp": ["oklch(15% 0.032 238.7)", "oklch(25% 0.032 238.7)", "oklch(35% 0.032 238.7)", "oklch(45% 0.032 238.7)", "oklch(60% 0.032 238.7)", "oklch(72% 0.032 238.7)", "oklch(84% 0.032 238.7)", "oklch(95% 0.032 238.7)"]
+        "displayName": "Quiet Metadata",
+        "canonical": "#8c9a96",
+        "tonalRamp": ["oklch(15% 0.017 176.8)", "oklch(25% 0.017 176.8)", "oklch(35% 0.017 176.8)", "oklch(45% 0.017 176.8)", "oklch(60% 0.017 176.8)", "oklch(72% 0.017 176.8)", "oklch(84% 0.017 176.8)", "oklch(95% 0.017 176.8)"]
       },
       "ground": {
         "role": "neutral",
-        "displayName": "Mineral Enamel",
-        "canonical": "#f8f7f1",
-        "tonalRamp": ["oklch(15% 0.008 98.9)", "oklch(25% 0.008 98.9)", "oklch(35% 0.008 98.9)", "oklch(45% 0.008 98.9)", "oklch(60% 0.008 98.9)", "oklch(72% 0.008 98.9)", "oklch(84% 0.008 98.9)", "oklch(95% 0.008 98.9)"]
+        "displayName": "Graphite Canvas",
+        "canonical": "#0c1217",
+        "tonalRamp": ["oklch(15% 0.014 243.8)", "oklch(25% 0.014 243.8)", "oklch(35% 0.014 243.8)", "oklch(45% 0.014 243.8)", "oklch(60% 0.014 243.8)", "oklch(72% 0.014 243.8)", "oklch(84% 0.014 243.8)", "oklch(95% 0.014 243.8)"]
       },
       "ground-deep": {
         "role": "neutral",
-        "displayName": "Recessed Enamel",
-        "canonical": "#f0efe9",
-        "tonalRamp": ["oklch(15% 0.008 98.9)", "oklch(25% 0.008 98.9)", "oklch(35% 0.008 98.9)", "oklch(45% 0.008 98.9)", "oklch(60% 0.008 98.9)", "oklch(72% 0.008 98.9)", "oklch(84% 0.008 98.9)", "oklch(95% 0.008 98.9)"]
+        "displayName": "Graphite Rail",
+        "canonical": "#0d1218",
+        "tonalRamp": ["oklch(15% 0.015 253.2)", "oklch(25% 0.015 253.2)", "oklch(35% 0.015 253.2)", "oklch(45% 0.015 253.2)", "oklch(60% 0.015 253.2)", "oklch(72% 0.015 253.2)", "oklch(84% 0.015 253.2)", "oklch(95% 0.015 253.2)"]
       },
       "panel": {
         "role": "neutral",
-        "displayName": "Instrument Panel",
-        "canonical": "#fcfbf7",
-        "tonalRamp": ["oklch(15% 0.005 95.1)", "oklch(25% 0.005 95.1)", "oklch(35% 0.005 95.1)", "oklch(45% 0.005 95.1)", "oklch(60% 0.005 95.1)", "oklch(72% 0.005 95.1)", "oklch(84% 0.005 95.1)", "oklch(95% 0.005 95.1)"]
+        "displayName": "Graphite Surface",
+        "canonical": "#0e151a",
+        "tonalRamp": ["oklch(15% 0.015 239.6)", "oklch(25% 0.015 239.6)", "oklch(35% 0.015 239.6)", "oklch(45% 0.015 239.6)", "oklch(60% 0.015 239.6)", "oklch(72% 0.015 239.6)", "oklch(84% 0.015 239.6)", "oklch(95% 0.015 239.6)"]
       },
       "line": {
         "role": "neutral",
-        "displayName": "Metal Seam",
-        "canonical": "#c1ccd3",
-        "tonalRamp": ["oklch(15% 0.016 235.4)", "oklch(25% 0.016 235.4)", "oklch(35% 0.016 235.4)", "oklch(45% 0.016 235.4)", "oklch(60% 0.016 235.4)", "oklch(72% 0.016 235.4)", "oklch(84% 0.016 235.4)", "oklch(95% 0.016 235.4)"]
+        "displayName": "Ledger Rule",
+        "canonical": "#2a363a",
+        "tonalRamp": ["oklch(15% 0.018 220.1)", "oklch(25% 0.018 220.1)", "oklch(35% 0.018 220.1)", "oklch(45% 0.018 220.1)", "oklch(60% 0.018 220.1)", "oklch(72% 0.018 220.1)", "oklch(84% 0.018 220.1)", "oklch(95% 0.018 220.1)"]
       },
       "line-soft": {
         "role": "neutral",
-        "displayName": "Hairline Seam",
-        "canonical": "#dce2e3",
-        "tonalRamp": ["oklch(15% 0.007 208.8)", "oklch(25% 0.007 208.8)", "oklch(35% 0.007 208.8)", "oklch(45% 0.007 208.8)", "oklch(60% 0.007 208.8)", "oklch(72% 0.007 208.8)", "oklch(84% 0.007 208.8)", "oklch(95% 0.007 208.8)"]
+        "displayName": "Hairline Rule",
+        "canonical": "#202b30",
+        "tonalRamp": ["oklch(15% 0.018 227.4)", "oklch(25% 0.018 227.4)", "oklch(35% 0.018 227.4)", "oklch(45% 0.018 227.4)", "oklch(60% 0.018 227.4)", "oklch(72% 0.018 227.4)", "oklch(84% 0.018 227.4)", "oklch(95% 0.018 227.4)"]
       },
       "circuit": {
         "role": "primary",
-        "displayName": "Live Circuit Cobalt",
-        "canonical": "#095294",
-        "tonalRamp": ["oklch(15% 0.126 252.3)", "oklch(25% 0.126 252.3)", "oklch(35% 0.126 252.3)", "oklch(45% 0.126 252.3)", "oklch(60% 0.126 252.3)", "oklch(72% 0.126 252.3)", "oklch(84% 0.126 252.3)", "oklch(95% 0.126 252.3)"]
+        "displayName": "Ledger Mint",
+        "canonical": "#4bcc99",
+        "tonalRamp": ["oklch(15% 0.136 163.5)", "oklch(25% 0.136 163.5)", "oklch(35% 0.136 163.5)", "oklch(45% 0.136 163.5)", "oklch(60% 0.136 163.5)", "oklch(72% 0.136 163.5)", "oklch(84% 0.136 163.5)", "oklch(95% 0.136 163.5)"]
       },
       "circuit-dark": {
         "role": "primary",
-        "displayName": "Deep Circuit Cobalt",
-        "canonical": "#073e70",
-        "tonalRamp": ["oklch(15% 0.101 251.8)", "oklch(25% 0.101 251.8)", "oklch(35% 0.101 251.8)", "oklch(45% 0.101 251.8)", "oklch(60% 0.101 251.8)", "oklch(72% 0.101 251.8)", "oklch(84% 0.101 251.8)", "oklch(95% 0.101 251.8)"]
+        "displayName": "Bright Mint",
+        "canonical": "#73dbb4",
+        "tonalRamp": ["oklch(15% 0.113 167.0)", "oklch(25% 0.113 167.0)", "oklch(35% 0.113 167.0)", "oklch(45% 0.113 167.0)", "oklch(60% 0.113 167.0)", "oklch(72% 0.113 167.0)", "oklch(84% 0.113 167.0)", "oklch(95% 0.113 167.0)"]
       },
       "circuit-soft": {
         "role": "primary",
-        "displayName": "Pale Circuit Wash",
-        "canonical": "#e7eff5",
-        "tonalRamp": ["oklch(15% 0.012 239.9)", "oklch(25% 0.012 239.9)", "oklch(35% 0.012 239.9)", "oklch(45% 0.012 239.9)", "oklch(60% 0.012 239.9)", "oklch(72% 0.012 239.9)", "oklch(84% 0.012 239.9)", "oklch(95% 0.012 239.9)"]
+        "displayName": "Mint Well",
+        "canonical": "#122c24",
+        "tonalRamp": ["oklch(15% 0.036 171.2)", "oklch(25% 0.036 171.2)", "oklch(35% 0.036 171.2)", "oklch(45% 0.036 171.2)", "oklch(60% 0.036 171.2)", "oklch(72% 0.036 171.2)", "oklch(84% 0.036 171.2)", "oklch(95% 0.036 171.2)"]
       },
       "ok": {
         "role": "tertiary",
-        "displayName": "Protection Green",
-        "canonical": "#237354",
-        "tonalRamp": ["oklch(15% 0.092 163.4)", "oklch(25% 0.092 163.4)", "oklch(35% 0.092 163.4)", "oklch(45% 0.092 163.4)", "oklch(60% 0.092 163.4)", "oklch(72% 0.092 163.4)", "oklch(84% 0.092 163.4)", "oklch(95% 0.092 163.4)"]
+        "displayName": "Healthy Mint",
+        "canonical": "#5ad3a5",
+        "tonalRamp": ["oklch(15% 0.128 165.3)", "oklch(25% 0.128 165.3)", "oklch(35% 0.128 165.3)", "oklch(45% 0.128 165.3)", "oklch(60% 0.128 165.3)", "oklch(72% 0.128 165.3)", "oklch(84% 0.128 165.3)", "oklch(95% 0.128 165.3)"]
       },
       "warn": {
         "role": "tertiary",
-        "displayName": "Deep Safety Amber",
-        "canonical": "#b66516",
-        "tonalRamp": ["oklch(15% 0.133 57.7)", "oklch(25% 0.133 57.7)", "oklch(35% 0.133 57.7)", "oklch(45% 0.133 57.7)", "oklch(60% 0.133 57.7)", "oklch(72% 0.133 57.7)", "oklch(84% 0.133 57.7)", "oklch(95% 0.133 57.7)"]
+        "displayName": "Quiet Amber",
+        "canonical": "#d5a967",
+        "tonalRamp": ["oklch(15% 0.099 76.5)", "oklch(25% 0.099 76.5)", "oklch(35% 0.099 76.5)", "oklch(45% 0.099 76.5)", "oklch(60% 0.099 76.5)", "oklch(72% 0.099 76.5)", "oklch(84% 0.099 76.5)", "oklch(95% 0.099 76.5)"]
       },
       "warn-bright": {
         "role": "tertiary",
-        "displayName": "Safety Amber",
-        "canonical": "#d67d21",
-        "tonalRamp": ["oklch(15% 0.147 60.1)", "oklch(25% 0.147 60.1)", "oklch(35% 0.147 60.1)", "oklch(45% 0.147 60.1)", "oklch(60% 0.147 60.1)", "oklch(72% 0.147 60.1)", "oklch(84% 0.147 60.1)", "oklch(95% 0.147 60.1)"]
+        "displayName": "Readable Amber",
+        "canonical": "#e1b872",
+        "tonalRamp": ["oklch(15% 0.100 80.0)", "oklch(25% 0.100 80.0)", "oklch(35% 0.100 80.0)", "oklch(45% 0.100 80.0)", "oklch(60% 0.100 80.0)", "oklch(72% 0.100 80.0)", "oklch(84% 0.100 80.0)", "oklch(95% 0.100 80.0)"]
       },
       "fault": {
         "role": "tertiary",
-        "displayName": "Fault Red",
-        "canonical": "#b63832",
-        "tonalRamp": ["oklch(15% 0.163 27.0)", "oklch(25% 0.163 27.0)", "oklch(35% 0.163 27.0)", "oklch(45% 0.163 27.0)", "oklch(60% 0.163 27.0)", "oklch(72% 0.163 27.0)", "oklch(84% 0.163 27.0)", "oklch(95% 0.163 27.0)"]
+        "displayName": "Fault Rose",
+        "canonical": "#ef8585",
+        "tonalRamp": ["oklch(15% 0.130 20.7)", "oklch(25% 0.130 20.7)", "oklch(35% 0.130 20.7)", "oklch(45% 0.130 20.7)", "oklch(60% 0.130 20.7)", "oklch(72% 0.130 20.7)", "oklch(84% 0.130 20.7)", "oklch(95% 0.130 20.7)"]
       },
       "focus": {
         "role": "primary",
-        "displayName": "Focus Blue",
-        "canonical": "#0c6db7",
-        "tonalRamp": ["oklch(15% 0.141 249.3)", "oklch(25% 0.141 249.3)", "oklch(35% 0.141 249.3)", "oklch(45% 0.141 249.3)", "oklch(60% 0.141 249.3)", "oklch(72% 0.141 249.3)", "oklch(84% 0.141 249.3)", "oklch(95% 0.141 249.3)"]
+        "displayName": "Focus Mint",
+        "canonical": "#73dbb4",
+        "tonalRamp": ["oklch(15% 0.113 167.0)", "oklch(25% 0.113 167.0)", "oklch(35% 0.113 167.0)", "oklch(45% 0.113 167.0)", "oklch(60% 0.113 167.0)", "oklch(72% 0.113 167.0)", "oklch(84% 0.113 167.0)", "oklch(95% 0.113 167.0)"]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Identity Display",
-        "purpose": "Split-screen login identity only."
-      },
-      "headline": {
-        "displayName": "Instrument Headline",
-        "purpose": "Page titles and major usage readouts."
-      },
-      "title": {
-        "displayName": "Panel Title",
-        "purpose": "Panel heads, circuit labels, and compact product marks."
-      },
-      "body": {
-        "displayName": "Operational Body",
-        "purpose": "Controls, table cells, form copy, and explanations."
-      },
-      "label": {
-        "displayName": "Telemetry Label",
-        "purpose": "Identifiers, timestamps, counters, ledger headers, and readouts."
-      }
+      "display": { "displayName": "Workspace Display", "purpose": "Page titles and primary workspace identity." },
+      "metric": { "displayName": "Ledger Metric", "purpose": "Dominant measured values such as monthly token usage." },
+      "title": { "displayName": "Working Title", "purpose": "Section and modal headings." },
+      "body": { "displayName": "Operational Body", "purpose": "Chinese controls, rows, forms, and explanations." },
+      "label": { "displayName": "Data Label", "purpose": "Figures, timestamps, keys, aliases, request IDs, code, and telemetry only." }
     },
     "shadows": [
-      {
-        "name": "modal-lift",
-        "value": "0 24px 60px rgba(1,36,69,.2)",
-        "purpose": "Blocking dialogs above the ink-tinted backdrop; operational surfaces remain flat."
-      }
+      { "name": "modal-lift", "value": "0 28px 72px rgba(0,0,0,.5)", "purpose": "Blocking dialogs above the dark backdrop; ordinary ledger regions remain flat." },
+      { "name": "password-gate-lift", "value": "0 28px 72px rgba(0,0,0,.36)", "purpose": "Mandatory password-change surface only." }
     ],
     "motion": [
-      {
-        "name": "control-snap",
-        "value": "160ms ease-out",
-        "purpose": "Button color, border, background, and press-state transitions."
-      },
-      {
-        "name": "field-focus",
-        "value": "150ms ease-out",
-        "purpose": "Input border and focus-ring transitions."
-      },
-      {
-        "name": "circuit-entry",
-        "value": "620ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "One restrained access-line trace on entry when reduced motion is not requested."
-      }
+      { "name": "control-state", "value": "160ms ease-out", "purpose": "Button color, background, border, and press-state transitions." },
+      { "name": "field-focus", "value": "150ms ease-out", "purpose": "Input border and focus-ring transitions." },
+      { "name": "ledger-meter-fill", "value": "560ms cubic-bezier(.16,1,.3,1)", "purpose": "The single quota-meter reveal when reduced motion is not requested." }
     ],
     "breakpoints": [
       { "name": "compressed-desktop", "value": "1120px" },
@@ -158,119 +128,97 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Compact cobalt switch for the next decisive operation.",
-      "html": "<button class=\"ds-button ds-button-primary\" type=\"button\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>新增上游</button>",
-      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out, transform 160ms ease-out; } .ds-button-primary { color: #fff; background: var(--circuit); border-color: var(--circuit); } .ds-button-primary:hover { background: var(--circuit-dark); border-color: var(--circuit-dark); } .ds-button-primary:active { transform: translateY(1px); } .ds-button-primary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+      "description": "Compact mint control for the next decisive action.",
+      "html": "<button class=\"ds-button ds-button-primary\" type=\"button\">确认操作</button>",
+      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out, transform 160ms ease-out; } .ds-button-primary { color: #07110d; background: var(--circuit); border-color: var(--circuit); } .ds-button-primary:hover { background: var(--circuit-dark); border-color: var(--circuit-dark); } .ds-button-primary:active { transform: translateY(1px); } .ds-button-primary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Seam-bounded enamel switch for supporting actions.",
+      "description": "Transparent supporting action bounded by one cool-gray seam.",
       "html": "<button class=\"ds-button ds-button-secondary\" type=\"button\">刷新</button>",
-      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out, transform 160ms ease-out; } .ds-button-secondary { color: var(--ink); background: var(--panel); border-color: #9fb0ba; } .ds-button-secondary:hover { color: var(--circuit); background: #fff; border-color: var(--circuit); } .ds-button-secondary:active { transform: translateY(1px); } .ds-button-secondary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
-    },
-    {
-      "name": "Danger Button",
-      "kind": "button",
-      "refersTo": "button-danger",
-      "description": "Fault-red switch reserved for destructive actions.",
-      "html": "<button class=\"ds-button ds-button-danger\" type=\"button\">撤销 Key</button>",
-      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 160ms ease-out, transform 160ms ease-out; } .ds-button-danger { color: #fff; background: var(--fault); border-color: var(--fault); } .ds-button-danger:hover { opacity: .88; } .ds-button-danger:active { transform: translateY(1px); } .ds-button-danger:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
-    },
-    {
-      "name": "Ghost Button",
-      "kind": "button",
-      "refersTo": "button-ghost",
-      "description": "Quiet ink action that reveals a pale circuit field on hover.",
-      "html": "<button class=\"ds-button ds-button-ghost\" type=\"button\">编辑 / 换 Key</button>",
-      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, transform 160ms ease-out; } .ds-button-ghost { color: var(--ink-soft); background: transparent; } .ds-button-ghost:hover { color: var(--circuit); background: var(--circuit-soft); } .ds-button-ghost:active { transform: translateY(1px); } .ds-button-ghost:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+      "css": ".ds-button { min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: color 160ms ease-out, background-color 160ms ease-out, border-color 160ms ease-out, transform 160ms ease-out; } .ds-button-secondary { color: var(--ink); background: transparent; border-color: #435157; } .ds-button-secondary:hover { color: var(--circuit-dark); background: #111a1f; border-color: #5a6a70; } .ds-button-secondary:active { transform: translateY(1px); } .ds-button-secondary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
     },
     {
       "name": "Text Field",
       "kind": "input",
       "refersTo": "field-input",
-      "description": "Compact labeled field with a white inset and cobalt focus ring.",
-      "html": "<label class=\"ds-field\"><span>公开模型名</span><input type=\"text\" placeholder=\"qwen-plus\"/><small>用户只会看到这个名称</small></label>",
-      "css": ".ds-field { min-width: 0; display: flex; flex-direction: column; gap: 7px; color: var(--ink-soft); font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 12px; font-weight: 700; } .ds-field input { width: 100%; height: 42px; padding: 0 11px; color: var(--ink); caret-color: var(--circuit); background: #fff; border: 1px solid #aebbc2; border-radius: 2px; outline: none; font: inherit; transition: border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-field input:hover { border-color: #718a99; } .ds-field input:focus { border-color: var(--circuit); box-shadow: 0 0 0 3px rgba(9,82,148,.14); } .ds-field small { color: var(--muted); font-size: 11px; font-weight: 500; line-height: 1.45; }"
+      "description": "Dark compact field with mint focus and browser-autofill correction.",
+      "html": "<label class=\"ds-field\"><span>公开模型名</span><input type=\"text\" autocomplete=\"off\" placeholder=\"输入名称\"/><small>用户只会看到这个名称</small></label>",
+      "css": ".ds-field { min-width: 0; display: flex; flex-direction: column; gap: 7px; color: var(--ink-soft); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 12px; font-weight: 700; } .ds-field input { width: 100%; height: 42px; padding: 0 11px; color: var(--ink); caret-color: var(--circuit); background: #0a1014; border: 1px solid #3a474d; border-radius: 7px; outline: none; font: inherit; transition: border-color 150ms ease-out, box-shadow 150ms ease-out; } .ds-field input::placeholder { color: #71807b; } .ds-field input:hover { border-color: #59686d; } .ds-field input:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(75,204,153,.12); } .ds-field input:-webkit-autofill, .ds-field input:-webkit-autofill:hover, .ds-field input:-webkit-autofill:focus { -webkit-text-fill-color: var(--ink); caret-color: var(--circuit); box-shadow: 0 0 0 1000px #0a1014 inset, 0 0 0 3px rgba(75,204,153,.12); } .ds-field small { color: var(--muted); font-size: 11px; font-weight: 500; line-height: 1.45; }"
     },
     {
       "name": "Active Navigation Control",
       "kind": "nav",
       "refersTo": "nav-active",
-      "description": "Ink-filled current section in the desktop rail or mobile instrument strip.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"管理控制台\"><button class=\"ds-nav-item ds-nav-item-active\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M12 12l4-4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>总览</button><button class=\"ds-nav-item\">上游</button></nav>",
-      "css": ".ds-nav { width: 188px; padding: 6px; background: var(--ground-deep); } .ds-nav-item { width: 100%; min-height: 42px; margin: 2px 0; padding: 0 11px; color: var(--ink-soft); background: transparent; border: 1px solid transparent; border-radius: 2px; display: flex; align-items: center; gap: 10px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 650; cursor: pointer; } .ds-nav-item:hover { color: var(--ink); background: #fff; border-color: var(--line-soft); } .ds-nav-item-active { color: #fff; background: var(--ink); border-color: var(--ink); } .ds-nav-item-active svg { color: #8ec1e2; } .ds-nav-item:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+      "description": "Unfilled current section located by one small mint square and brighter text.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"个人控制台\"><button class=\"ds-nav-item ds-nav-item-active\" aria-current=\"page\">用量</button><button class=\"ds-nav-item\">访问 Key</button><button class=\"ds-nav-item\">接入指南</button></nav>",
+      "css": ".ds-nav { width: 190px; padding: 8px 14px; background: var(--ground-deep); } .ds-nav-item { width: 100%; min-height: 44px; margin: 1px 0; padding: 0 14px 0 32px; position: relative; color: var(--muted); background: transparent; border: 0; border-radius: 6px; display: flex; align-items: center; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 13px; font-weight: 650; cursor: pointer; } .ds-nav-item::before { content: \"\"; width: 6px; height: 6px; position: absolute; left: 13px; top: 50%; background: transparent; border-radius: 1px; transform: translateY(-50%); } .ds-nav-item:hover { color: var(--ink-soft); background: rgba(255,255,255,.025); } .ds-nav-item-active { color: var(--ink); } .ds-nav-item-active::before { background: var(--circuit); } .ds-nav-item:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Usage Meter",
+      "kind": "custom",
+      "description": "Signature slim capacity line with one reduced-motion-safe reveal.",
+      "html": "<div class=\"ds-usage\"><span>本月已使用</span><strong>—</strong><small>登录后显示真实额度</small><div class=\"ds-meter\" aria-label=\"登录后显示用量比例\"><i></i></div></div>",
+      "css": ".ds-usage { color: var(--ink); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; display: grid; gap: 10px; } .ds-usage > span, .ds-usage > small { color: var(--muted); font-size: 12px; } .ds-usage strong { font-family: \"SFMono-Regular\", \"Roboto Mono\", Consolas, monospace; font-size: 48px; font-weight: 500; line-height: 1; letter-spacing: -.035em; } .ds-meter { height: 7px; overflow: hidden; background: #263138; border-radius: 2px; } .ds-meter i { width: 0; height: 100%; display: block; background: var(--circuit); border-radius: 2px; transform-origin: left center; } @media (prefers-reduced-motion: no-preference) { .ds-meter i { animation: ds-ledger-meter-fill 560ms cubic-bezier(.16,1,.3,1) both; } } @keyframes ds-ledger-meter-fill { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }"
+    },
+    {
+      "name": "Ledger Section",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Open working region separated by rules instead of a floating card.",
+      "html": "<section class=\"ds-ledger\"><header><div><h2>允许使用的模型</h2><p>模型权限由管理员分配</p></div></header><div class=\"ds-ledger-row\"><code>—</code><span>登录后显示可用模型</span></div></section>",
+      "css": ".ds-ledger { overflow: hidden; color: var(--ink); background: transparent; border: 0; border-top: 1px solid var(--line); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; } .ds-ledger header { min-height: 68px; padding: 20px 0 15px; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; } .ds-ledger h2 { margin: 0 0 6px; font-size: 17px; font-weight: 650; } .ds-ledger p { margin: 0; color: var(--muted); font-size: 10px; } .ds-ledger-row { min-height: 49px; padding: 0 2px; border-bottom: 1px solid var(--line-soft); display: grid; grid-template-columns: 80px 1fr; align-items: center; gap: 12px; color: var(--ink-soft); font-size: 11px; } .ds-ledger-row:hover { background: rgba(255,255,255,.025); } .ds-ledger-row code { color: var(--muted); font-family: \"SFMono-Regular\", \"Roboto Mono\", Consolas, monospace; }"
     },
     {
       "name": "Healthy Status Pill",
       "kind": "chip",
-      "refersTo": "status-pill",
-      "description": "Compact health label used inside ledgers and key rows.",
+      "description": "Compact categorical status with color and text redundancy.",
       "html": "<span class=\"ds-pill ds-pill-ok\"><i aria-hidden=\"true\"></i>正常</span>",
-      "css": ".ds-pill { width: fit-content; padding: 3px 7px; color: var(--ink-soft); background: #e3e8e8; border-radius: 99px; display: inline-flex; align-items: center; gap: 5px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 9px; font-weight: 750; } .ds-pill i { width: 7px; height: 7px; background: var(--ok); border-radius: 50%; } .ds-pill-ok { color: #15543d; background: #d9eee4; }"
+      "css": ".ds-pill { width: fit-content; padding: 3px 7px; color: var(--ink-soft); background: #253036; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; font-size: 9px; font-weight: 750; } .ds-pill i { width: 7px; height: 7px; background: var(--ok); border-radius: 50%; } .ds-pill-ok { color: #9ce8ca; background: #15382d; }"
     },
     {
-      "name": "Operational Panel",
+      "name": "Blocking Modal",
       "kind": "card",
-      "refersTo": "panel",
-      "description": "Flat seam-defined container for ledgers, charts, and working content.",
-      "html": "<section class=\"ds-panel\"><header><div><h2>最近调用</h2><p>仅展示元数据，不保存输入和回答正文</p></div><span aria-hidden=\"true\">⌁</span></header><div class=\"ds-panel-row\"><i></i><strong>qwen-plus</strong><code>req_4ac2f20e</code><span>200</span></div></section>",
-      "css": ".ds-panel { overflow: hidden; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 3px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; } .ds-panel header { min-height: 62px; padding: 14px 17px; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; justify-content: space-between; } .ds-panel h2 { margin: 0 0 3px; font-family: \"DIN Alternate\", \"Avenir Next Condensed\", \"Arial Narrow\", sans-serif; font-size: 17px; } .ds-panel p { margin: 0; color: var(--muted); font-size: 10px; } .ds-panel-row { min-height: 43px; padding: 0 14px; display: grid; grid-template-columns: 8px 1fr 130px 50px; align-items: center; gap: 12px; color: #183b51; font-size: 10px; font-variant-numeric: tabular-nums; } .ds-panel-row:hover { background: #f2f5f5; } .ds-panel-row i { width: 7px; height: 7px; background: var(--ok); border-radius: 50%; } .ds-panel-row code { overflow: hidden; color: var(--muted); font-family: \"SFMono-Regular\", \"Roboto Mono\", Consolas, monospace; font-size: 9px; text-overflow: ellipsis; }"
-    },
-    {
-      "name": "Access Circuit Node",
-      "kind": "custom",
-      "description": "Signature live-stage module combining a circuit node, state lamp, and operational readout.",
-      "html": "<article class=\"ds-circuit-node\"><span class=\"ds-node-symbol\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" aria-hidden=\"true\"><ellipse cx=\"12\" cy=\"5\" rx=\"7\" ry=\"3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M5 5v12c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 11c0 1.7 3.1 3 7 3s7-1.3 7-3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg></span><span class=\"ds-node-copy\"><small>上游服务</small><strong>2 / 2</strong><em>加密凭证 · 公网 HTTPS</em></span><i class=\"ds-state-lamp\" aria-label=\"通路\"></i></article>",
-      "css": ".ds-circuit-node { min-height: 126px; padding: 12px 4px; position: relative; color: var(--ink); display: flex; align-items: center; gap: 12px; font-family: \"Avenir Next\", \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; } .ds-circuit-node::after { content: \"\"; height: 3px; position: absolute; left: 48px; right: 0; top: calc(50% - 1px); z-index: -1; background: var(--circuit); } .ds-node-symbol { width: 50px; height: 50px; flex: 0 0 auto; color: var(--circuit); background: var(--panel); border: 2px solid var(--circuit); border-radius: 50%; display: grid; place-items: center; } .ds-node-copy { display: flex; flex-direction: column; gap: 4px; background: var(--ground); padding-right: 8px; } .ds-node-copy small { color: var(--muted); font-size: 10px; font-weight: 800; } .ds-node-copy strong { font-family: \"DIN Alternate\", \"Avenir Next Condensed\", \"Arial Narrow\", sans-serif; font-size: 22px; font-variant-numeric: tabular-nums; } .ds-node-copy em { color: var(--muted); font-size: 9px; font-style: normal; } .ds-state-lamp { width: 8px; height: 8px; position: absolute; right: 4px; top: 12px; background: var(--circuit); border-radius: 50%; }"
+      "refersTo": "modal",
+      "description": "The only lifted surface, used for authenticated forms and consequential actions.",
+      "html": "<section class=\"ds-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"ds-modal-title\"><header><h2 id=\"ds-modal-title\">登录控制台</h2><button aria-label=\"关闭\">×</button></header><div class=\"ds-modal-body\"><p>账号由管理员创建，不开放公开注册。</p><button class=\"ds-modal-action\" type=\"button\">登录</button></div></section>",
+      "css": ".ds-modal { width: min(520px, 100%); overflow: hidden; color: var(--ink); background: #11191e; border: 1px solid #415057; border-radius: 10px; box-shadow: 0 28px 72px rgba(0,0,0,.5); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif; } .ds-modal header { height: 60px; padding: 0 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; } .ds-modal h2 { margin: 0; font-size: 19px; } .ds-modal header button { width: 34px; height: 34px; color: var(--ink-soft); background: transparent; border: 1px solid transparent; border-radius: 7px; font-size: 20px; cursor: pointer; } .ds-modal header button:hover { color: var(--circuit-dark); background: var(--circuit-soft); border-color: #285244; } .ds-modal header button:focus-visible, .ds-modal-action:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; } .ds-modal-body { padding: 21px; display: grid; gap: 16px; } .ds-modal-body p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; } .ds-modal-action { min-height: 38px; padding: 0 14px; justify-self: end; color: #07110d; background: var(--circuit); border: 1px solid var(--circuit); border-radius: 7px; font: inherit; font-weight: 700; cursor: pointer; } .ds-modal-action:hover { background: var(--circuit-dark); border-color: var(--circuit-dark); }"
     }
   ],
   "narrative": {
-    "northStar": "The Electric-Utility Single-Line Dispatch Board",
-    "overview": "Token Station is an operational control surface, not a generic SaaS dashboard. Its visual world is a mineral-enamel dispatch board where upstream providers, public model routes, quota checks, and user permissions read as one traceable electrical circuit. Ink-blue control rails and hard metal seams establish authority; cobalt shows the live path; amber isolates degraded or incomplete stages; red is reserved for faults.\n\nThe system is compact, flat, and exact. Continuous ledgers, tabular figures, engraved-looking labels, breaker geometry, and near-square controls make the interface feel built for supervision rather than presentation. The login, administrator console, user console, forms, and dialogs all remain inside the same material world.",
+    "northStar": "Open Ledger",
+    "overview": "Token Station is a quiet operational ledger on one continuous graphite canvas. Whitespace and hairline seams organize quota, routing, access keys, permissions, and audit metadata without turning the console into a card wall. Soft white copy carries the facts; one low-saturation mint signal shows the active path or the next decisive action.\n\nThe world is calm, compact, and factual. Authentication unlocks private values and actions, while signed-out views keep protected values visibly unknown rather than filling the interface with examples. Role boundaries, destructive consequences, and security facts remain explicit at the point of action.",
     "keyCharacteristics": [
-      "Mineral-enamel grounds with ink-blue control structure.",
-      "One visible access circuit as the signature operational model.",
-      "Compact ledgers, tabular readouts, and monospaced identifiers.",
-      "Hard seams, near-square controls, and restrained state motion.",
-      "Cobalt live states, amber warnings, red faults, and green confirmation only."
+      "Deep graphite canvas with very small tonal steps between chrome and working regions.",
+      "Hairline seams, open sections, and generous horizontal breathing room instead of stacked cards.",
+      "One restrained mint signal for active location, capacity, focus, and decisive action.",
+      "Soft white hierarchy with monospaced type reserved for measured or machine-readable data.",
+      "Compact controls, explicit unknown states, and one reduced-motion-safe meter fill."
     ],
     "rules": [
-      {
-        "name": "The Three-State Circuit Rule",
-        "body": "Cobalt means live, amber means degraded or waiting, and red means blocked; never swap these meanings or rely on color without text, icon, or geometry.",
-        "section": "colors"
-      },
-      {
-        "name": "The Green Is Confirmation Rule",
-        "body": "Green confirms health or protection only; it never replaces cobalt as the system's primary voice.",
-        "section": "colors"
-      },
-      {
-        "name": "The Readout Split Rule",
-        "body": "Human-facing Chinese copy stays in the workhorse sans; identifiers, timestamps, aliases, counters, and telemetry move to the monospaced readout face.",
-        "section": "typography"
-      },
-      {
-        "name": "The Flat-By-Default Rule",
-        "body": "Keep operational surfaces flush and seam-defined; reserve physical lift for modal interruption only.",
-        "section": "elevation"
-      }
+      { "name": "The One Mint Signal Rule", "body": "Mint is the only recurring accent and should remain visually rare: active location, primary action, capacity, focus, or live state only.", "section": "colors" },
+      { "name": "The Unknown Remains Unknown Rule", "body": "Protected values render as an em dash with a short login explanation; never substitute sample quotas, counts, permissions, or keys.", "section": "colors" },
+      { "name": "The Semantic Exception Rule", "body": "Amber warns and rose faults; both require a text label, icon, or state geometry so color is never the only carrier.", "section": "colors" },
+      { "name": "The Data-Only Mono Rule", "body": "Use monospaced type for figures, timestamps, keys, model aliases, request IDs, code, and telemetry only; human-facing navigation and explanatory Chinese stay in the system sans.", "section": "typography" },
+      { "name": "The Ledger-Stays-Flat Rule", "body": "Operational content remains flush with the canvas; physical lift belongs only to blocking tasks.", "section": "elevation" }
     ],
     "dos": [
-      "Do make the upstream-to-user dependency chain visible before asking operators to interpret rows of data.",
-      "Do use hard seams, compact labels, and tabular figures to make state easy to scan and compare.",
-      "Do preserve the cobalt, amber, red state grammar with text, icon, or shape redundancy.",
-      "Do adapt the circuit into an ordered vertical sequence on narrow screens while preserving its meaning.",
-      "Do keep sensitive, destructive, empty, loading, and error states explicit and operational."
+      "Do keep quota, routing, key, permission, and audit facts on one continuous graphite canvas.",
+      "Do separate working regions with whitespace and hairline rules before adding a bounded container.",
+      "Do use mint sparingly for active location, decisive action, capacity, focus, and live state.",
+      "Do keep private signed-out values unknown and explain that login loads the real data.",
+      "Do preserve compact controls, readable contrast, dark autofill treatment, explicit security copy, and responsive horizontal navigation.",
+      "Do use monospaced type only for measured or machine-readable data."
     ],
     "donts": [
-      "Don't replace the continuous dispatch-board structure with floating bento cards, glass surfaces, gradients, or decorative shadows.",
-      "Don't use green as the primary brand color or red for ordinary emphasis.",
-      "Don't soften controls into oversized capsules; rounded forms are reserved for lamps, nodes, and compact status pills.",
-      "Don't add photography, perspective device mockups, decorative texture, or invented security claims.",
-      "Don't rasterize circuit labels, data, icons, or topology that can remain semantic HTML, SVG, and CSS."
+      "Don't reintroduce Matrix code rain, scanlines, neon glow, decorative grids, gradients, glass, or visual theatre.",
+      "Don't rebuild the workspace as a wall of floating cards or ambient shadows.",
+      "Don't fabricate quotas, counts, permissions, model names, keys, or operational status for signed-out or empty views.",
+      "Don't turn every label into terminal typography or uppercase telemetry.",
+      "Don't fill the active navigation row; the small mint square is the selected-state signature.",
+      "Don't add motion beyond the single quota-meter reveal and restrained control-state transitions."
     ]
   }
 }

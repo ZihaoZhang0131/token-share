@@ -118,10 +118,10 @@ export function InlineError({ message }: { message: string }) {
   return <div className="inline-error" role="alert">{message}</div>;
 }
 
-export function Meter({ value, max }: { value: number; max: number }) {
+export function Meter({ value, max, label }: { value: number; max: number; label?: string }) {
   const percent = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
   return (
-    <div className="meter" aria-label={`已使用 ${percent.toFixed(1)}%`}>
+    <div className="meter" aria-label={label ?? `已使用 ${percent.toFixed(1)}%`}>
       <span style={{ width: `${percent}%` }} />
     </div>
   );

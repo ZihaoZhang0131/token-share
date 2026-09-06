@@ -54,8 +54,7 @@ export default function UserConsole({
       <button className={tab === "keys" ? "active" : ""} onClick={() => setTab("keys")} aria-current={tab === "keys" ? "page" : undefined}><KeyRound size={17} />访问 Key</button>
       <button className={tab === "guide" ? "active" : ""} onClick={() => setTab("guide")} aria-current={tab === "guide" ? "page" : undefined}><BookOpen size={17} />接入指南</button>
     </div><div className="security-note"><ShieldCheck size={17} /><span><strong>隐私模式</strong><small>不保存提示词和回答正文</small></span></div></aside>
-    <main className="workspace"><div className="page-head"><div><h1>{tab === "usage" ? "本月用量" : tab === "keys" ? "访问 Key" : "接入指南"}</h1><p className="page-subtitle">{session?.user.email ?? "未登录 · 数据尚未加载"}</p></div>{tab === "keys" && <Button onClick={session ? () => setCreateOpen(true) : onLoginRequired} disabled={Boolean(session) && keys.filter((key) => key.active).length >= 5}><Plus size={16} />{session ? "创建 Key" : "登录后创建"}</Button>}</div>
-      {isGuest && <section className="guest-notice"><div><strong>你正在使用未登录视图</strong><p>这是实际控制台。登录后会在这里加载你的真实额度、模型权限与访问 Key。</p></div><Button variant="secondary" onClick={onLoginRequired}>登录加载数据</Button></section>}
+    <main className={`workspace user-workspace user-workspace-${tab}`}><div className="page-head"><div><h1>{tab === "usage" ? "本月用量" : tab === "keys" ? "访问 Key" : "接入指南"}</h1><p className="page-subtitle">{session?.user.email ?? "登录后加载真实额度、模型权限与访问 Key"}</p></div>{tab === "keys" && <Button onClick={session ? () => setCreateOpen(true) : onLoginRequired} disabled={Boolean(session) && keys.filter((key) => key.active).length >= 5}><Plus size={16} />{session ? "创建 Key" : "登录后创建"}</Button>}</div>
       {error && <InlineError message={error} />}
       {tab === "usage" && <UsageView usage={usage} models={models} guest={isGuest} />}
       {tab === "keys" && <KeysView keys={keys} onRevoke={revoke} guest={isGuest} onLoginRequired={onLoginRequired} />}
@@ -70,8 +69,8 @@ function UsageView({ usage, models, guest = false }: { usage: Usage | null; mode
   const maxDay = useMemo(() => Math.max(1, ...(usage?.daily.map((item) => item.tokens) ?? [1])), [usage]);
   const usedPercent = usage && usage.monthly_token_limit > 0 ? (usage.used_tokens / usage.monthly_token_limit) * 100 : 0;
   if (guest) return <>
-    <section className="usage-hero guest-usage"><div><span>本月已使用</span><strong>—</strong><small>剩余额度 —</small></div><div className="usage-meter"><Meter value={0} max={1} /><span>— / —</span></div></section>
-    <section className="stats-grid three"><article className="stat-card"><span>请求数</span><strong>0</strong><small>登录后显示</small></article><article className="stat-card"><span>输入 Token</span><strong>0</strong><small>登录后显示</small></article><article className="stat-card"><span>输出 Token</span><strong>0</strong><small>登录后显示</small></article></section>
+    <section className="usage-hero guest-usage"><div><span>本月已使用</span><strong>—</strong><small>剩余额度 —</small></div><div className="usage-meter"><Meter value={0} max={1} label="登录后显示用量比例" /><span>— / —</span></div></section>
+    <section className="stats-grid three"><article className="stat-card"><span>请求数</span><strong>—</strong><small>登录后显示</small></article><article className="stat-card"><span>输入 Token</span><strong>—</strong><small>登录后显示</small></article><article className="stat-card"><span>输出 Token</span><strong>—</strong><small>登录后显示</small></article></section>
     <section className="panel"><div className="panel-head"><div><h2>每日 Token</h2><p>按北京时间统计</p></div></div><Empty>登录后显示每日用量</Empty></section>
     <section className="panel"><div className="panel-head"><div><h2>允许使用的模型</h2><p>模型权限由管理员分配</p></div></div><Empty>登录后显示可用模型</Empty></section>
   </>;
