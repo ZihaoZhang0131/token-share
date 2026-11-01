@@ -106,6 +106,8 @@ class ModelRoute(Base):
     provider_id: Mapped[str] = mapped_column(ForeignKey("providers.id", ondelete="RESTRICT"))
     max_output_tokens: Mapped[int] = mapped_column(Integer, default=4096)
     tokenizer: Mapped[str] = mapped_column(String(50), default="cl100k_base")
+    api_mode: Mapped[str] = mapped_column(String(16), default="chat", server_default="chat")
+    reasoning_effort: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(

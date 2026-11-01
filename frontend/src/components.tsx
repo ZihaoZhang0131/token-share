@@ -35,10 +35,11 @@ export function SelectField({
   children,
   ...props
 }: React.SelectHTMLAttributes<HTMLSelectElement> & { label: string; children: ReactNode }) {
+  const labelId = useId();
   return (
     <label className="field">
-      <span>{label}</span>
-      <select {...props}>{children}</select>
+      <span id={labelId}>{label}</span>
+      <select aria-labelledby={labelId} {...props}>{children}</select>
     </label>
   );
 }

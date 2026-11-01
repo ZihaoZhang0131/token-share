@@ -16,6 +16,7 @@ import {
 import { api, formatDate, formatNumber } from "./api";
 import { Button, Empty, Field, InlineError, Modal, SelectField } from "./components";
 import type { AuditLog, DashboardStats, ModelRoute, Provider, UsageLog, User } from "./types";
+import { modeLabel } from "./IntegrationGuide";
 
 type Tab = "overview" | "providers" | "models" | "users" | "logs" | "audit";
 
@@ -229,7 +230,7 @@ function Models({ models, providers, onChanged, onEdit }: { models: ModelRoute[]
     await onChanged();
   }
   if (!models.length) return <Empty>还没有公开模型映射。先创建上游，再添加模型。</Empty>;
-  return <section className="panel table-panel"><table><thead><tr><th>公开模型名</th><th>上游模型</th><th>上游</th><th>最大输出</th><th>状态</th><th /></tr></thead><tbody>{models.map((model) => <tr key={model.id}><td><code>{model.public_name}</code></td><td>{model.upstream_model}</td><td>{providerName(model.provider_id)}</td><td>{formatNumber(model.max_output_tokens)}</td><td><span className={`pill ${model.active ? "pill-ok" : ""}`}>{model.active ? "启用" : "停用"}</span></td><td className="row-actions"><Button variant="ghost" onClick={() => onEdit(model)}>编辑</Button><Button variant="ghost" onClick={() => toggle(model)}>{model.active ? "停用" : "启用"}</Button></td></tr>)}</tbody></table></section>;
+  return <section className="panel table-panel"><table><thead><tr><th>公开模型名</th><th>上游模型</th><th>上游</th><th>接入模式 / 推理</th><th>最大输出</th><th>状态</th><th /></tr></thead><tbody>{models.map((model) => <tr key={model.id}><td><code>{model.public_name}</code></td><td>{model.upstream_model}</td><td>{providerName(model.provider_id)}</td><td>{modeLabel(model.api_mode)}<br /><small>{model.reasoning_effort ? `固定 ${model.reasoning_effort}` : "不固定"}</small></td><td>{formatNumber(model.max_output_tokens)}</td><td><span className={`pill ${model.active ? "pill-ok" : ""}`}>{model.active ? "启用" : "停用"}</span></td><td className="row-actions"><Button variant="ghost" onClick={() => onEdit(model)}>编辑</Button><Button variant="ghost" onClick={() => toggle(model)}>{model.active ? "停用" : "启用"}</Button></td></tr>)}</tbody></table></section>;
 }
 
 function UsersView({ users, models, onChanged, onReset, onEdit }: { users: User[]; models: ModelRoute[]; onChanged: () => Promise<void>; onReset: (user: User) => void; onEdit: (user: User) => void }) {
@@ -281,10 +282,41 @@ function ProviderForm({ provider, onClose, onSaved }: { provider?: Provider; onC
 }
 
 function ModelForm({ model, providers, onClose, onSaved }: { model?: ModelRoute; providers: Provider[]; onClose: () => void; onSaved: () => Promise<void> }) {
-  const [form, setForm] = useState({ public_name: model?.public_name ?? "", upstream_model: model?.upstream_model ?? "", provider_id: model?.provider_id ?? providers[0]?.id ?? "", max_output_tokens: model?.max_output_tokens ?? 4096, tokenizer: model?.tokenizer ?? "cl100k_base" });
+  const [form, setForm] = useState({ public_name: model?.public_name ?? "", upstream_model: model?.upstream_model ?? "", provider_id: model?.provider_id ?? providers[0]?.id ?? "", max_output_tokens: model?.max_output_tokens ?? 16384, tokenizer: model?.tokenizer ?? "cl100k_base", api_mode: model?.api_mode ?? "chat", reasoning_effort: model?.reasoning_effort ?? "" });
   const [error, setError] = useState("");
-  async function submit(event: FormEvent) { event.preventDefault(); setError(""); try { await api(model ? `/api/admin/models/${model.id}` : "/api/admin/models", { method: model ? "PATCH" : "POST", body: JSON.stringify(form) }); await onSaved(); } catch (reason) { setError(reason instanceof Error ? reason.message : "保存失败"); } }
-  return <Modal title={model ? "编辑模型映射" : "新增模型映射"} onClose={onClose}><form className="modal-form" onSubmit={submit}><Field label="公开模型名" placeholder="qwen-plus" value={form.public_name} onChange={(e) => setForm({ ...form, public_name: e.target.value })} required hint="用户只会看到这个名称" /><Field label="上游真实模型名" placeholder="qwen-plus-latest" value={form.upstream_model} onChange={(e) => setForm({ ...form, upstream_model: e.target.value })} required /><SelectField label="上游" value={form.provider_id} onChange={(e) => setForm({ ...form, provider_id: e.target.value })}>{providers.map((provider) => <option key={provider.id} value={provider.id}>{provider.name}</option>)}</SelectField><Field label="最大输出 Token" type="number" min={1} value={form.max_output_tokens} onChange={(e) => setForm({ ...form, max_output_tokens: Number(e.target.value) })} /><Field label="Tokenizer" value={form.tokenizer} onChange={(e) => setForm({ ...form, tokenizer: e.target.value })} />{error && <InlineError message={error} />}<div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit">保存映射</Button></div></form></Modal>;
+  const [busy, setBusy] = useState(false);
+  async function submit(event: FormEvent) {
+    event.preventDefault(); setError(""); setBusy(true);
+    try {
+      await api(model ? `/api/admin/models/${model.id}` : "/api/admin/models", {
+        method: model ? "PATCH" : "POST",
+        body: JSON.stringify({ ...form, reasoning_effort: form.reasoning_effort || null })
+      });
+      await onSaved();
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "保存失败"); }
+    finally { setBusy(false); }
+  }
+  return <Modal title={model ? "编辑模型映射" : "新增模型映射"} onClose={onClose}>
+    <form className="modal-form" onSubmit={submit}>
+      <Field label="公开模型名" placeholder="gpt-6.1-sol-high" value={form.public_name} onChange={(e) => setForm({ ...form, public_name: e.target.value })} required hint="用户选择的别名；不同推理档位使用不同别名" />
+      <Field label="上游真实模型名" placeholder="gpt-6.1-sol" value={form.upstream_model} onChange={(e) => setForm({ ...form, upstream_model: e.target.value })} required />
+      <SelectField label="上游" value={form.provider_id} onChange={(e) => setForm({ ...form, provider_id: e.target.value })}>{providers.map((provider) => <option key={provider.id} value={provider.id}>{provider.name}</option>)}</SelectField>
+      <div className="form-grid">
+        <SelectField label="接入模式" value={form.api_mode} onChange={(e) => setForm({ ...form, api_mode: e.target.value as ModelRoute["api_mode"] })}>
+          <option value="chat">聊天 · Chat Completions</option><option value="responses">编码 · Responses</option><option value="both">聊天 + 编码</option>
+        </SelectField>
+        <SelectField label="固定推理强度" value={form.reasoning_effort} onChange={(e) => setForm({ ...form, reasoning_effort: e.target.value })}>
+          <option value="">不固定 · 客户端 / 上游默认</option>
+          {["low", "medium", "high", "xhigh", "max", "none", "minimal"].map((effort) => <option key={effort} value={effort}>{effort}</option>)}
+        </SelectField>
+      </div>
+      <p className="notice">固定档位不可被客户端覆盖。GPT-6.1 Sol 支持 low 至 max；工具调用需开启编码模式。编码模式不存储会话，工具由客户端执行。</p>
+      <Field label="最大输出 Token" type="number" min={1} max={262144} value={form.max_output_tokens} onChange={(e) => setForm({ ...form, max_output_tokens: Number(e.target.value) })} hint="包含推理与回答；不是输入上限。需小于用户及 Key 可用 TPM。" />
+      <Field label="Tokenizer" value={form.tokenizer} onChange={(e) => setForm({ ...form, tokenizer: e.target.value })} />
+      {error && <InlineError message={error} />}
+      <div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit" disabled={busy}>{busy ? "正在保存…" : "保存映射"}</Button></div>
+    </form>
+  </Modal>;
 }
 
 function UserForm({ models, onClose, onSaved }: { models: ModelRoute[]; onClose: () => void; onSaved: () => Promise<void> }) {

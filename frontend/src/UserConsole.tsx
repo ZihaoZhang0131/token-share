@@ -3,6 +3,7 @@ import { BarChart3, BookOpen, Copy, KeyRound, Plus, ShieldCheck, Trash2 } from "
 import { api, formatDate, formatNumber } from "./api";
 import { Button, Empty, Field, InlineError, Meter, Modal } from "./components";
 import type { AccessKey, ModelRoute, Session, Usage } from "./types";
+import Guide from "./IntegrationGuide";
 
 type Tab = "usage" | "keys" | "guide";
 
@@ -88,19 +89,6 @@ function KeysView({ keys, onRevoke, guest = false, onLoginRequired }: { keys: Ac
   return <div className="key-list">{keys.map((key) => <article className={`key-row ${key.active ? "" : "disabled"}`} key={key.id}><div className="key-icon"><KeyRound size={19} /></div><div className="key-main"><div><strong>{key.name}</strong><span className={`pill ${key.active ? "pill-ok" : ""}`}>{key.active ? "有效" : "已撤销"}</span></div><code>ts_sk_{key.prefix}_••••{key.last4}</code><small>创建 {formatDate(key.created_at)} · 最近使用 {formatDate(key.last_used_at)}</small></div><dl><div><dt>RPM</dt><dd>{formatNumber(key.rpm_limit)}</dd></div><div><dt>TPM</dt><dd>{formatNumber(key.tpm_limit)}</dd></div></dl>{key.active && <Button variant="ghost" onClick={() => onRevoke(key)} aria-label={`撤销 ${key.name}`}><Trash2 size={16} />撤销</Button>}</article>)}</div>;
 }
 
-function Guide({ models }: { models: ModelRoute[] }) {
-  const base = window.location.origin;
-  const model = models[0]?.public_name ?? "你的公开模型名";
-  const curl = `curl ${base}/v1/chat/completions \\\n  -H "Authorization: Bearer $TOKEN_STATION_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"model":"${model}","messages":[{"role":"user","content":"你好"}]}'`;
-  const python = `from openai import OpenAI\n\nclient = OpenAI(\n    api_key="你的中转站 Key",\n    base_url="${base}/v1"\n)\n\nresponse = client.chat.completions.create(\n    model="${model}",\n    messages=[{"role": "user", "content": "你好"}]\n)\nprint(response.choices[0].message.content)`;
-  return <div className="guide-stack"><section className="panel guide-intro"><h2>两项配置即可接入</h2><div><span>1</span><p><strong>Base URL</strong><code>{base}/v1</code></p></div><div><span>2</span><p><strong>API Key</strong><code>ts_sk_…</code></p></div></section><CodeBlock title="curl" code={curl} /><CodeBlock title="Python · OpenAI SDK" code={python} /><div className="notice">请不要把中转站 Key 提交到 Git、前端代码或公开日志。服务端会自动选择真实上游凭证。</div></div>;
-}
-
-function CodeBlock({ title, code }: { title: string; code: string }) {
-  const [copied, setCopied] = useState(false);
-  async function copy() { await navigator.clipboard.writeText(code); setCopied(true); window.setTimeout(() => setCopied(false), 1500); }
-  return <section className="code-card"><div><strong>{title}</strong><Button variant="ghost" onClick={copy}><Copy size={15} />{copied ? "已复制" : "复制"}</Button></div><pre><code>{code}</code></pre></section>;
-}
 
 function CreateKey({ rpmLimit, tpmLimit, onClose, onCreated }: { rpmLimit: number; tpmLimit: number; onClose: () => void; onCreated: (secret: string) => Promise<void> }) {
   const [form, setForm] = useState({ name: "", rpm_limit: Math.min(10, rpmLimit), tpm_limit: Math.min(50000, tpmLimit) }); const [error, setError] = useState(""); const [busy, setBusy] = useState(false);

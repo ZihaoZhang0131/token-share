@@ -14,10 +14,10 @@ from sqlalchemy import select, text
 
 from app.api_admin import router as admin_router
 from app.api_auth import router as auth_router
-from app.api_proxy import router as proxy_router
 from app.api_user import router as user_router
 from app.config import get_settings
 from app.database import SessionLocal, create_tables
+from app.gateway import router as proxy_router
 from app.models import Role, User
 from app.quotas import QuotaService
 from app.security import hash_password, validate_password_strength
@@ -106,7 +106,7 @@ async def validation_error(request: Request, exc: RequestValidationError):
             status_code=422,
             content={
                 "error": {
-                    "message": "请求参数不符合 Chat Completions 格式",
+                    "message": "请求参数不符合当前接口格式",
                     "type": "invalid_request_error",
                     "param": None,
                     "code": "validation_error",

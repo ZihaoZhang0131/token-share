@@ -1,0 +1,120 @@
+"""Endpoint and reasoning policy, applied before quota reservation or upstream I/O."""
+
+from __future__ import annotations
+
+from app.models import ModelRoute
+
+EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max"}
+
+
+def is_sol(model: str) -> bool:
+    return model == "gpt-6.1-sol" or model.startswith("gpt-6.1-sol-20")
+
+
+def validate_route(model: str, effort: str | None) -> None:
+    if is_sol(model) and effort in {"none", "minimal"}:
+        raise ValueError("GPT-6.1 Sol 仅支持 low / medium / high / xhigh / max")
+
+
+def check_resources(value):
+    # Shared upstream credentials must never become a cross-user resource lookup API.
+    if isinstance(value, dict):
+        if value.get("type") == "additional_tools":
+            validate_tools(value.get("tools", []))
+        if value.get("type") == "item_reference" or any(
+            k in value for k in ("file_id", "vector_store_ids", "container_id")
+        ):
+            raise ValueError("不支持引用上游私有资源；请由客户端直接提交内容")
+        for child in value.values():
+            check_resources(child)
+    elif isinstance(value, list):
+        for child in value:
+            check_resources(child)
+
+
+def validate_tools(tools):
+    if not isinstance(tools, list):
+        raise ValueError("tools 必须是数组")
+    for tool in tools:
+        if not isinstance(tool, dict):
+            raise ValueError("工具格式错误")
+        if tool.get("type") == "namespace":
+            validate_tools(tool.get("tools", []))
+        elif tool.get("type") not in {"function", "custom"}:
+            raise ValueError("仅支持客户端 function/custom 工具及 namespace，不支持托管工具")
+
+
+def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
+    if route.api_mode not in {protocol, "both"}:
+        raise ValueError("此模型未启用当前接口，请选择匹配的聊天或编码模型")
+    if protocol == "responses":
+        if any(
+            payload.get(k) is not None for k in ("previous_response_id", "conversation", "prompt")
+        ):
+            raise ValueError("仅支持无状态 Responses；请在 input 中传回历史和工具结果")
+        if payload.get("background") or payload.get("store"):
+            raise ValueError("编码模式不支持后台任务或存储；请设置 store=false")
+        validate_tools(payload.get("tools") or [])
+        if (
+            "reasoning_effort" in payload
+            or "max_tokens" in payload
+            or "max_completion_tokens" in payload
+        ):
+            raise ValueError("Responses 请使用 reasoning.effort 和 max_output_tokens")
+        reasoning = payload.get("reasoning") or {}
+        if not isinstance(reasoning, dict):
+            raise ValueError("reasoning 必须为对象")
+        effort = reasoning.get("effort")
+        output_field = "max_output_tokens"
+    else:
+        if payload.get("stream_options") is not None and not isinstance(
+            payload["stream_options"], dict
+        ):
+            raise ValueError("stream_options 必须为对象")
+        if "reasoning" in payload or "max_output_tokens" in payload:
+            raise ValueError("Chat 请使用 reasoning_effort 和 max_completion_tokens")
+        if (
+            payload.get("max_tokens") is not None
+            and payload.get("max_completion_tokens") is not None
+        ):
+            raise ValueError("max_tokens 和 max_completion_tokens 不能同时设置")
+        effort = payload.get("reasoning_effort")
+        output_field = (
+            "max_completion_tokens"
+            if ("max_completion_tokens" in payload or is_sol(route.upstream_model))
+            else "max_tokens"
+        )
+        if is_sol(route.upstream_model) and (payload.get("tools") or payload.get("functions")):
+            raise ValueError("GPT-6.1 Sol 的工具调用请使用 /v1/responses 编码接口")
+        if payload.get("n", 1) != 1:
+            raise ValueError("为保证配额准确，仅支持 n=1")
+        if output_field == "max_completion_tokens" and "max_tokens" in payload:
+            payload[output_field] = payload.pop("max_tokens")
+    if effort is not None and (not isinstance(effort, str) or effort not in EFFORTS):
+        raise ValueError("不支持的推理强度")
+    if route.reasoning_effort is not None:
+        if effort is not None and effort != route.reasoning_effort:
+            raise ValueError(f"此公开模型固定使用 {route.reasoning_effort} 推理强度，不允许覆盖")
+        effort = route.reasoning_effort
+    validate_route(route.upstream_model, effort)
+    if effort is not None:
+        if protocol == "responses":
+            payload["reasoning"] = {**reasoning, "effort": effort}
+        else:
+            payload["reasoning_effort"] = effort
+    if is_sol(route.upstream_model):
+        if any(
+            payload.get(k) is not None for k in ("temperature", "top_p", "logprobs", "top_logprobs")
+        ):
+            raise ValueError("GPT-6.1 Sol 推理模式请移除 temperature/top_p/logprobs 参数")
+    check_resources(payload)
+    requested = payload.get(output_field, route.max_output_tokens)
+    if isinstance(requested, bool) or not isinstance(requested, int) or requested < 1:
+        raise ValueError("最大输出 Token 必须为正整数")
+    if requested > route.max_output_tokens:
+        raise ValueError(f"最大输出 Token 不能超过 {route.max_output_tokens}")
+    # The same bound is sent upstream, not just reserved locally.
+    payload[output_field] = requested
+    payload["store"] = False
+    payload["model"] = route.upstream_model
+    return payload

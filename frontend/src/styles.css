@@ -690,6 +690,8 @@ td code { color: var(--circuit-dark); background: var(--circuit-soft); border-ra
 .guide-intro { padding: 23px 0 28px; }
 .guide-intro > div > span { color: #07110d; background: var(--circuit); border-radius: 5px; }
 .guide-intro code { color: var(--ink-soft); }
+.guide-intro > .form-grid { display: grid; align-items: start; margin-bottom: 16px; }
+.guide-intro > p { display: block; margin-top: 10px; overflow-wrap: anywhere; }
 .code-card { color: var(--ink); background: #090e12; border: 1px solid var(--line); border-radius: 8px; }
 .code-card > div { color: var(--ink-soft); border-bottom-color: var(--line); }
 .code-card .button { color: var(--muted); }

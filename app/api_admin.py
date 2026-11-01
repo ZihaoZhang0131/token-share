@@ -324,6 +324,12 @@ async def create_model(
     identity: SessionIdentity = Depends(require_admin_csrf),
     db: AsyncSession = Depends(get_db),
 ):
+    from app.model_policy import validate_route
+
+    try:
+        validate_route(payload.upstream_model, payload.reasoning_effort)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from None
     provider = await db.get(Provider, payload.provider_id)
     if not provider:
         raise HTTPException(status_code=422, detail="上游不存在")
@@ -358,6 +364,17 @@ async def update_model(
     if not route:
         raise HTTPException(status_code=404, detail="模型不存在")
     changes = payload.model_dump(exclude_unset=True)
+    from app.model_policy import validate_route
+
+    if any(value is None for key, value in changes.items() if key != "reasoning_effort"):
+        raise HTTPException(status_code=422, detail="仅推理强度允许清空")
+    try:
+        validate_route(
+            changes.get("upstream_model", route.upstream_model),
+            changes.get("reasoning_effort", route.reasoning_effort),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from None
     if "provider_id" in changes and not await db.get(Provider, changes["provider_id"]):
         raise HTTPException(status_code=422, detail="上游不存在")
     for key, value in changes.items():

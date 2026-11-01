@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -98,6 +98,10 @@ class ModelCreate(BaseModel):
     provider_id: str
     max_output_tokens: int = Field(default=4096, ge=1, le=262144)
     tokenizer: str = Field(default="cl100k_base", min_length=1, max_length=50)
+    api_mode: Literal["chat", "responses", "both"] = "chat"
+    reasoning_effort: Optional[
+        Literal["none", "minimal", "low", "medium", "high", "xhigh", "max"]
+    ] = None
 
 
 class ModelUpdate(BaseModel):
@@ -107,6 +111,10 @@ class ModelUpdate(BaseModel):
     max_output_tokens: Optional[int] = Field(default=None, ge=1, le=262144)
     tokenizer: Optional[str] = Field(default=None, min_length=1, max_length=50)
     active: Optional[bool] = None
+    api_mode: Optional[Literal["chat", "responses", "both"]] = None
+    reasoning_effort: Optional[
+        Literal["none", "minimal", "low", "medium", "high", "xhigh", "max"]
+    ] = None
 
 
 class ModelView(ORMModel):
@@ -116,6 +124,8 @@ class ModelView(ORMModel):
     provider_id: str
     max_output_tokens: int
     tokenizer: str
+    api_mode: str
+    reasoning_effort: Optional[str]
     active: bool
     created_at: datetime
 
@@ -206,3 +216,13 @@ class ChatRequest(BaseModel):
             if not isinstance(item, dict) or "role" not in item:
                 raise ValueError("each message must contain role")
         return value
+
+
+class ResponsesRequest(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    model: str = Field(min_length=1, max_length=120)
+    input: Union[str, List[Dict[str, Any]]]
+    instructions: Optional[str] = None
+    stream: bool = False
+    max_output_tokens: Optional[int] = Field(default=None, ge=1)

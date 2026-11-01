@@ -1,6 +1,6 @@
 # Token Station
 
-一个私有、可部署的 OpenAI Chat Completions 中转站。管理员在服务端配置真实上游 API Key，用户只拿到独立的中转 Key；系统提供模型权限、RPM/TPM、月 Token 额度、元数据日志和中文控制台。
+一个私有、可部署的 OpenAI Chat Completions / Responses 中转站。管理员在服务端配置真实上游 API Key，用户只拿到独立的中转 Key；系统提供聊天、编码工具调用、固定推理档位、模型权限、RPM/TPM、月 Token 额度、元数据日志和中文控制台。
 
 ## 安全边界
 
@@ -17,6 +17,8 @@
 
 - `GET /v1/models`
 - `POST /v1/chat/completions`，支持 JSON 和 SSE 流式响应
+- `POST /v1/responses`，支持无状态编码工具循环、JSON 和具名 SSE；不执行客户端工具
+- 模型可配置聊天 / 编码 / 双模式，以及固定推理强度；详见 [聊天与编码模式接入指南](docs/聊天与编码模式接入指南.md)
 - 管理员：上游、公开模型映射、用户、额度、调用日志、审计日志
 - 用户：本月用量、模型权限、创建和撤销最多 5 把访问 Key、接入示例
 - Redis 原子 RPM/TPM/月额度预留，PostgreSQL 最终用量账本
