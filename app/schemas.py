@@ -14,7 +14,9 @@ class ORMModel(BaseModel):
 
 class UserView(ORMModel):
     id: str
-    email: EmailStr
+    # Validate emails on writes, not while serializing historical database rows.
+    # One legacy/imported address must not take down the whole admin user list.
+    email: str
     display_name: str
     role: Role
     must_change_password: bool

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import {
   Activity,
   Boxes,
@@ -17,6 +17,7 @@ import { api, formatDate, formatNumber } from "./api";
 import { Button, Empty, Field, InlineError, Modal, SelectField } from "./components";
 import type { AuditLog, DashboardStats, ModelRoute, Provider, UsageLog, User } from "./types";
 import { modeLabel } from "./IntegrationGuide";
+import { loadAdminSection } from "./loadAdminSection";
 
 type Tab = "overview" | "providers" | "models" | "users" | "logs" | "audit";
 
@@ -38,6 +39,8 @@ export default function AdminConsole() {
   const [logs, setLogs] = useState<UsageLog[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const loadGeneration = useRef(0);
   const [modal, setModal] = useState<"provider" | "model" | "user" | null>(null);
   const [resetUser, setResetUser] = useState<User | null>(null);
   const [editProvider, setEditProvider] = useState<Provider | null>(null);
@@ -45,28 +48,33 @@ export default function AdminConsole() {
   const [editUser, setEditUser] = useState<User | null>(null);
 
   const loadAll = useCallback(async () => {
+    const generation = ++loadGeneration.current;
+    setLoading(true);
     setError("");
-    try {
-      const [nextStats, nextProviders, nextModels, nextUsers, nextLogs, nextAuditLogs] = await Promise.all([
-        api<DashboardStats>("/api/admin/dashboard"),
-        api<Provider[]>("/api/admin/providers"),
-        api<ModelRoute[]>("/api/admin/models"),
-        api<User[]>("/api/admin/users"),
-        api<UsageLog[]>("/api/admin/logs?limit=200"),
-        api<AuditLog[]>("/api/admin/audit?limit=200")
-      ]);
-      setStats(nextStats);
-      setProviders(nextProviders);
-      setModels(nextModels);
-      setUsers(nextUsers);
-      setLogs(nextLogs);
-      setAuditLogs(nextAuditLogs);
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "加载失败");
+    function loadPart<T>(label: string, path: string, apply: (value: T) => void) {
+      return loadAdminSection(label, () => api<T>(path), (value) => {
+        if (generation === loadGeneration.current) apply(value);
+      });
+    }
+    const results = await Promise.all([
+      loadPart<DashboardStats>("总览", "/api/admin/dashboard", setStats),
+      loadPart<Provider[]>("上游", "/api/admin/providers", setProviders),
+      loadPart<ModelRoute[]>("模型", "/api/admin/models", setModels),
+      loadPart<User[]>("用户列表", "/api/admin/users", setUsers),
+      loadPart<UsageLog[]>("调用日志", "/api/admin/logs?limit=200", setLogs),
+      loadPart<AuditLog[]>("审计日志", "/api/admin/audit?limit=200", setAuditLogs)
+    ]);
+    if (generation === loadGeneration.current) {
+      const failures = results.filter(Boolean);
+      setError(failures.length ? `${failures.join("；")}。其他数据已独立加载；失败部分可能仍显示上次数据，请点击刷新重试。` : "");
+      setLoading(false);
     }
   }, []);
 
-  useEffect(() => { void loadAll(); }, [loadAll]);
+  useEffect(() => {
+    void loadAll();
+    return () => { loadGeneration.current += 1; };
+  }, [loadAll]);
 
   return (
     <div className="console-layout">
@@ -84,7 +92,7 @@ export default function AdminConsole() {
             <span><small>MODELS</small><strong>{stats ? formatNumber(stats.models) : "—"}</strong></span>
             <span><small>USERS</small><strong>{stats ? formatNumber(stats.users) : "—"}</strong></span>
           </div>
-          <div className="page-actions"><Button variant="secondary" onClick={loadAll}><RefreshCw size={15} />刷新</Button>
+          <div className="page-actions"><Button variant="secondary" onClick={loadAll} disabled={loading}><RefreshCw size={15} />{loading ? "正在刷新…" : "刷新"}</Button>
             {tab === "overview" && <Button variant="secondary" onClick={() => setTab("logs")}><ScrollText size={15} />查看日志</Button>}
             {tab === "overview" && <Button onClick={() => setModal("provider")}><Plus size={16} />新增上游</Button>}
             {tab === "providers" && <Button onClick={() => setModal("provider")}><Plus size={16} />新增上游</Button>}

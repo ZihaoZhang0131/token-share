@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import List, Optional
 
+from pydantic import EmailStr, TypeAdapter
 from sqlalchemy import (
     Boolean,
     DateTime,
@@ -18,7 +19,7 @@ from sqlalchemy import (
 )
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.types import JSON
 
 from app.database import Base
@@ -42,6 +43,11 @@ class Role(str, enum.Enum):
 
 class User(Base):
     __tablename__ = "users"
+
+    @validates("email")
+    def validate_email(self, key, value):
+        # Apply the same validation to ORM maintenance scripts as to HTTP input.
+        return str(TypeAdapter(EmailStr).validate_python(value)).lower()
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
