@@ -2,18 +2,35 @@
 
 from __future__ import annotations
 
+import re
+
 from app.models import ModelRoute
 
 EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max"}
+REASONING_LEVELS = ("low", "medium", "high", "xhigh", "max")
+OPENAI_MODEL_EFFORTS = {
+    "gpt-6-astra": REASONING_LEVELS,
+    "gpt-6.1-sol": REASONING_LEVELS,
+    "gpt-6.1-terra": ("none", *REASONING_LEVELS),
+    "gpt-6-sol": ("none", *REASONING_LEVELS),
+    "gpt-6-luna": ("none", *REASONING_LEVELS),
+    "gpt-5.6-sol": ("none", *REASONING_LEVELS),
+    "gpt-5.6-terra": ("none", *REASONING_LEVELS),
+    "gpt-5.6-luna": ("none", *REASONING_LEVELS),
+}
 
 
-def is_sol(model: str) -> bool:
-    return model == "gpt-6.1-sol" or model.startswith("gpt-6.1-sol-20")
+def model_family(model: str) -> str | None:
+    for family in OPENAI_MODEL_EFFORTS:
+        if model == family or re.fullmatch(re.escape(family) + r"-\d{4}-\d{2}-\d{2}", model):
+            return family
+    return None
 
 
 def validate_route(model: str, effort: str | None) -> None:
-    if is_sol(model) and effort in {"none", "minimal"}:
-        raise ValueError("GPT-6.1 Sol 仅支持 low / medium / high / xhigh / max")
+    family = model_family(model)
+    if family and effort is not None and effort not in OPENAI_MODEL_EFFORTS[family]:
+        raise ValueError(f"{family} 仅支持 {' / '.join(OPENAI_MODEL_EFFORTS[family])}")
 
 
 def check_resources(value):
@@ -45,6 +62,7 @@ def validate_tools(tools):
 
 
 def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
+    family = model_family(route.upstream_model)
     if route.api_mode not in {protocol, "both"}:
         raise ValueError("此模型未启用当前接口，请选择匹配的聊天或编码模型")
     if protocol == "responses":
@@ -81,11 +99,9 @@ def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
         effort = payload.get("reasoning_effort")
         output_field = (
             "max_completion_tokens"
-            if ("max_completion_tokens" in payload or is_sol(route.upstream_model))
+            if ("max_completion_tokens" in payload or family is not None)
             else "max_tokens"
         )
-        if is_sol(route.upstream_model) and (payload.get("tools") or payload.get("functions")):
-            raise ValueError("GPT-6.1 Sol 的工具调用请使用 /v1/responses 编码接口")
         if payload.get("n", 1) != 1:
             raise ValueError("为保证配额准确，仅支持 n=1")
         if output_field == "max_completion_tokens" and "max_tokens" in payload:
@@ -97,16 +113,29 @@ def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
             raise ValueError(f"此公开模型固定使用 {route.reasoning_effort} 推理强度，不允许覆盖")
         effort = route.reasoning_effort
     validate_route(route.upstream_model, effort)
+    # Confirmed against all eight production upstream models on 2026-11-01:
+    # max is accepted by Responses, but rejected by Chat Completions.
+    if family and protocol == "chat" and effort == "max":
+        raise ValueError("max 推理强度请使用 /v1/responses 编码接口")
+    if protocol == "chat" and (payload.get("tools") or payload.get("functions")):
+        responses_only = family in {"gpt-6-astra", "gpt-6.1-sol", "gpt-6.1-terra"}
+        reasoning_tools = family in {"gpt-6-sol", "gpt-6-luna"} and effort != "none"
+        if responses_only or reasoning_tools:
+            raise ValueError(f"{family} 当前档位的工具调用请使用 /v1/responses 编码接口")
     if effort is not None:
         if protocol == "responses":
             payload["reasoning"] = {**reasoning, "effort": effort}
         else:
             payload["reasoning_effort"] = effort
-    if is_sol(route.upstream_model):
+    if family and family.startswith("gpt-6") and effort != "none":
         if any(
             payload.get(k) is not None for k in ("temperature", "top_p", "logprobs", "top_logprobs")
         ):
-            raise ValueError("GPT-6.1 Sol 推理模式请移除 temperature/top_p/logprobs 参数")
+            raise ValueError(f"{family} 推理模式请移除 temperature/top_p/logprobs 参数")
+        if protocol == "responses" and "message.output_text.logprobs" in (
+            payload.get("include") or []
+        ):
+            raise ValueError(f"{family} 推理模式不支持输出 logprobs")
     check_resources(payload)
     requested = payload.get(output_field, route.max_output_tokens)
     if isinstance(requested, bool) or not isinstance(requested, int) or requested < 1:

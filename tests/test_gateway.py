@@ -136,7 +136,7 @@ def test_all_efforts_both_protocols_and_headers(relay_client):
             data = completion(body)
             data["debug"] = SECRET
         else:
-            assert body["reasoning_effort"] in {"low", "medium", "high", "xhigh", "max"}
+            assert body["reasoning_effort"] in {"low", "medium", "high", "xhigh"}
             assert body["max_completion_tokens"] == 256
             data = {
                 "model": "gpt-6.1-sol",
@@ -156,15 +156,19 @@ def test_all_efforts_both_protocols_and_headers(relay_client):
                 json={"model": alias, **body},
                 headers={"Cookie": "private=1", "x-private": "secret"},
             )
+            if endpoint == "chat/completions" and alias.endswith("-max"):
+                assert r.status_code == 422
+                assert "/v1/responses" in r.text
+                continue
             assert r.status_code == 200, r.text
             assert r.json()["model"] == alias and SECRET not in r.text
             assert "x-provider-secret" not in r.headers
-    assert len(seen) == 10
+    assert len(seen) == 9
 
     async def check():
         async with SessionLocal() as db:
             rows = list(await db.scalars(select(UsageLedger).where(UsageLedger.user_id == uid)))
-            assert len(rows) == 10 and sum(r.total_tokens for r in rows) == 200
+            assert len(rows) == 9 and sum(r.total_tokens for r in rows) == 180
 
     client.portal.call(check)
 
