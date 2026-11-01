@@ -2,7 +2,7 @@
 version: 1
 slug: "frontend-src-app-tsx"
 primary_target: "frontend/src/App.tsx"
-related_targets: ["frontend/src/Login.tsx","frontend/src/AdminConsole.tsx","frontend/src/UserConsole.tsx","frontend/src/components.tsx","frontend/src/styles.css"]
+related_targets: ["frontend/src/Login.tsx","frontend/src/AdminConsole.tsx","frontend/src/UserConsole.tsx","frontend/src/IntegrationGuide.tsx","frontend/src/components.tsx","frontend/src/styles.css"]
 ---
 
 # Frontend application redesign
@@ -20,6 +20,15 @@ related_targets: ["frontend/src/Login.tsx","frontend/src/AdminConsole.tsx","fron
 - Memorable moment: the monthly quota reads as one long ledger entry whose mint meter quietly reveals capacity without becoming a hero graphic.
 - Signature interaction: the current navigation item is located by one small mint square and brighter text; the quota meter performs one short reduced-motion-safe fill on load.
 - Boundary: no Matrix code rain, scanlines, neon, gradients, glass, decorative grids, marketing hero, or fabricated values.
+
+## Dual-mode extension
+
+- This is an extension of the existing Operate surface, not a redesign or a new visual identity. Keep the graphite/mint Open Ledger system and existing navigation.
+- Model administration adds chat / Responses / both and optional fixed reasoning effort to the existing compact form and model table. Use labeled native selects; distinguish the public alias, upstream model, mode and fixed effort. Different fixed efforts use different public aliases.
+- The integration guide keeps explanatory content inside the existing console: select a mode and an authorized public model, then copy the matching SDK, curl or Codex example. Preserve explicit empty states, credential handling guidance and copy-failure feedback.
+- Coding means stateless HTTP / SSE relay with client-owned history and client-executed tools. Explain unsupported hosted tools, resource IDs, stored sessions, background tasks, WebSocket and `/responses/compact` at the integration point; do not imply a browser IDE or server-side tool execution.
+- Continue the established responsive form layout, region-local horizontal scrolling for tables/code and accessible control labels. No new palette, typography, component family or decorative motion is introduced.
+- Implementation evidence: `frontend/src/AdminConsole.tsx`, `frontend/src/IntegrationGuide.tsx`, and `frontend/src/components.tsx`. Review captures are in `.impeccable/review/`; they are local UI evidence, not production acceptance.
 
 ## Sampled visual record
 
