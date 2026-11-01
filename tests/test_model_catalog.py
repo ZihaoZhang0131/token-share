@@ -10,28 +10,31 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.config import get_settings
 from app.database import Base
-from app.model_policy import OPENAI_MODEL_EFFORTS
+from app.model_policy import DEEPSEEK_MODEL_EFFORTS, OPENAI_MODEL_EFFORTS
 from app.models import ModelRoute, Provider, Role, User
 from app.security import encrypt_secret
 
-spec = importlib.util.spec_from_file_location(
-    "configure_openai_models",
-    Path(__file__).resolve().parents[1] / "scripts/configure_openai_models.py",
-)
-catalog = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(catalog)
 
+@pytest.mark.parametrize("vendor", ["openai", "deepseek"])
+def test_catalog_transaction_idempotency_and_permissions(tmp_path, monkeypatch, vendor):
+    spec = importlib.util.spec_from_file_location(
+        f"configure_{vendor}_models",
+        Path(__file__).resolve().parents[1] / f"scripts/configure_{vendor}_models.py",
+    )
+    catalog = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(catalog)
+    deepseek = vendor == "deepseek"
+    endpoint = "https://api.deepseek.com" if deepseek else "https://api.openai.com/v1"
 
-def test_catalog_transaction_idempotency_and_permissions(tmp_path, monkeypatch):
     async def check():
         engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'catalog.db'}")
         sessions = async_sessionmaker(engine, expire_on_commit=False)
         monkeypatch.setattr(catalog, "SessionLocal", sessions)
-        available = list(OPENAI_MODEL_EFFORTS)
+        available = list(DEEPSEEK_MODEL_EFFORTS if deepseek else OPENAI_MODEL_EFFORTS)
         real_client = httpx.AsyncClient
 
         def upstream(request):
-            assert str(request.url) == "https://api.openai.com/v1/models"
+            assert str(request.url) == endpoint + "/models"
             assert request.headers["authorization"] == "Bearer fixture-secret"
             return httpx.Response(200, json={"data": [{"id": m} for m in available]})
 
@@ -50,8 +53,8 @@ def test_catalog_transaction_idempotency_and_permissions(tmp_path, monkeypatch):
             async with sessions() as db:
                 secret = encrypt_secret("fixture-secret", get_settings())
                 provider = Provider(
-                    name="OpenAI",
-                    base_url="https://api.openai.com/v1",
+                    name=vendor,
+                    base_url=endpoint,
                     key_ciphertext=secret.ciphertext,
                     key_nonce=secret.nonce,
                     key_version=secret.version,
@@ -71,7 +74,7 @@ def test_catalog_transaction_idempotency_and_permissions(tmp_path, monkeypatch):
                 await db.flush()
                 db.add(
                     ModelRoute(
-                        public_name="gpt-5.6-sol",
+                        public_name=available[-1],
                         upstream_model="different",
                         provider_id=provider.id,
                     )
@@ -83,16 +86,31 @@ def test_catalog_transaction_idempotency_and_permissions(tmp_path, monkeypatch):
             async with sessions() as db:
                 assert await db.scalar(select(func.count()).select_from(ModelRoute)) == 1
                 await db.execute(delete(ModelRoute))
+                if deepseek:
+                    db.add(
+                        ModelRoute(
+                            public_name="deepseek-v4-pro",
+                            upstream_model="deepseek-v4-pro",
+                            provider_id=pid,
+                            api_mode="chat",
+                            max_output_tokens=100000,
+                        )
+                    )
                 await db.commit()
             await catalog.configure(pid)
             async with sessions() as db:
-                assert await db.scalar(select(func.count()).select_from(ModelRoute)) == 0
+                assert await db.scalar(select(func.count()).select_from(ModelRoute)) == int(
+                    deepseek
+                )
             await catalog.configure(pid, apply=True)
             await catalog.configure(pid, apply=True)
             async with sessions() as db:
                 routes = list(await db.scalars(select(ModelRoute)))
-                assert len(routes) == 54
-                assert sum(r.api_mode == "responses" for r in routes) == 8
+                assert len(routes) == (10 if deepseek else 54)
+                assert sum(r.api_mode == "responses" for r in routes) == (0 if deepseek else 8)
+                if deepseek:
+                    base = next(r for r in routes if r.public_name == "deepseek-v4-pro")
+                    assert base.max_output_tokens == 100000 and base.api_mode == "both"
                 assert (await db.get(User, uid)).allowed_models == ["existing-only"]
                 assert (await db.get(User, uid)).password_hash == "fixture"
             available.pop()

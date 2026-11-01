@@ -18,6 +18,10 @@ OPENAI_MODEL_EFFORTS = {
     "gpt-5.6-terra": ("none", *REASONING_LEVELS),
     "gpt-5.6-luna": ("none", *REASONING_LEVELS),
 }
+DEEPSEEK_MODEL_EFFORTS = {
+    "deepseek-flash": ("none", "low", "high", "max"),
+    "deepseek-v4-pro": ("none", "low", "high", "max"),
+}
 
 
 def model_family(model: str) -> str | None:
@@ -31,6 +35,47 @@ def validate_route(model: str, effort: str | None) -> None:
     family = model_family(model)
     if family and effort is not None and effort not in OPENAI_MODEL_EFFORTS[family]:
         raise ValueError(f"{family} 仅支持 {' / '.join(OPENAI_MODEL_EFFORTS[family])}")
+    if model in DEEPSEEK_MODEL_EFFORTS and effort is not None:
+        if effort not in DEEPSEEK_MODEL_EFFORTS[model]:
+            raise ValueError("DeepSeek 请使用实际档位 none / low / high / max")
+
+
+def prepare_deepseek(payload: dict, effort: str | None, protocol: str) -> None:
+    choice = payload.get("tool_choice")
+    forced_tool = choice is not None and choice not in ("auto", "none")
+    if protocol == "responses":
+        if "thinking" in payload:
+            raise ValueError("DeepSeek Responses 请使用 reasoning.effort，不要使用 thinking")
+        for tool in payload.get("tools") or []:
+            if tool.get("type") == "function":
+                continue
+            if tool.get("type") == "custom" and tool.get("name") == "apply_patch":
+                continue
+            raise ValueError("DeepSeek Responses 仅支持 function 和 apply_patch custom 工具")
+        if effort != "none" and forced_tool:
+            raise ValueError(
+                "DeepSeek 思考模式只支持 tool_choice=auto/none；强制工具请用 none 档位"
+            )
+        return
+    thinking = payload.get("thinking")
+    if thinking is not None and (
+        not isinstance(thinking, dict)
+        or set(thinking) != {"type"}
+        or not isinstance(thinking["type"], str)
+        or thinking["type"] not in {"enabled", "disabled"}
+    ):
+        raise ValueError("thinking 必须为包含 type=enabled 或 disabled 的对象")
+    if effort is not None:
+        expected = "disabled" if effort == "none" else "enabled"
+        if thinking is not None and thinking["type"] != expected:
+            raise ValueError("thinking 开关与推理强度冲突，不允许覆盖固定档位")
+        payload["thinking"] = {"type": expected}
+        if effort == "none":
+            # Normalize to the explicit toggle, which takes precedence upstream.
+            payload.pop("reasoning_effort", None)
+    thinking_enabled = (payload.get("thinking") or {}).get("type", "enabled") == "enabled"
+    if thinking_enabled and forced_tool:
+        raise ValueError("DeepSeek 思考模式只支持 tool_choice=auto/none；强制工具请用 none 档位")
 
 
 def check_resources(value):
@@ -63,6 +108,7 @@ def validate_tools(tools):
 
 def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
     family = model_family(route.upstream_model)
+    deepseek = route.upstream_model in DEEPSEEK_MODEL_EFFORTS
     if route.api_mode not in {protocol, "both"}:
         raise ValueError("此模型未启用当前接口，请选择匹配的聊天或编码模型")
     if protocol == "responses":
@@ -97,6 +143,8 @@ def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
         ):
             raise ValueError("max_tokens 和 max_completion_tokens 不能同时设置")
         effort = payload.get("reasoning_effort")
+        if deepseek and "max_completion_tokens" in payload:
+            payload["max_tokens"] = payload.pop("max_completion_tokens")
         output_field = (
             "max_completion_tokens"
             if ("max_completion_tokens" in payload or family is not None)
@@ -127,6 +175,8 @@ def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
             payload["reasoning"] = {**reasoning, "effort": effort}
         else:
             payload["reasoning_effort"] = effort
+    if deepseek:
+        prepare_deepseek(payload, effort, protocol)
     if family and family.startswith("gpt-6") and effort != "none":
         if any(
             payload.get(k) is not None for k in ("temperature", "top_p", "logprobs", "top_logprobs")
