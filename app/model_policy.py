@@ -31,6 +31,40 @@ def model_family(model: str) -> str | None:
     return None
 
 
+def official_output_limit(model: str) -> int | None:
+    if model_family(model):
+        return 128000
+    if model in DEEPSEEK_MODEL_EFFORTS:
+        return 393216
+    return None
+
+
+def validate_output_limits(model: str, maximum: int, default: int | None) -> None:
+    official = official_output_limit(model)
+    if official is not None and maximum > official:
+        raise ValueError(f"{model} 官方最大输出为 {official} Token")
+    if default is not None and default > maximum:
+        raise ValueError("默认输出额度不能超过模型允许上限")
+
+
+def default_output_budget(route: ModelRoute, payload: dict, protocol: str, effort) -> int:
+    """Resolve only omitted request budgets; explicit client budgets always win."""
+    if route.default_output_tokens is not None:
+        budget = route.default_output_tokens
+    elif route.upstream_model in DEEPSEEK_MODEL_EFFORTS:
+        disabled = effort == "none"
+        if protocol == "chat":
+            disabled = (payload.get("thinking") or {}).get("type") == "disabled"
+        budget = 8192 if disabled else (131072 if effort == "max" else 65536)
+    elif model_family(route.upstream_model):
+        intensive = effort in {"high", "xhigh", "max"}
+        coding = protocol == "responses" and effort != "none"
+        budget = 65536 if intensive or coding else 32768
+    else:
+        budget = 4096
+    return min(budget, route.max_output_tokens)
+
+
 def validate_route(model: str, effort: str | None) -> None:
     family = model_family(model)
     if family and effort is not None and effort not in OPENAI_MODEL_EFFORTS[family]:
@@ -187,7 +221,9 @@ def prepare_payload(route: ModelRoute, payload: dict, protocol: str) -> dict:
         ):
             raise ValueError(f"{family} 推理模式不支持输出 logprobs")
     check_resources(payload)
-    requested = payload.get(output_field, route.max_output_tokens)
+    requested = payload.get(output_field)
+    if requested is None:
+        requested = default_output_budget(route, payload, protocol, effort)
     if isinstance(requested, bool) or not isinstance(requested, int) or requested < 1:
         raise ValueError("最大输出 Token 必须为正整数")
     if requested > route.max_output_tokens:

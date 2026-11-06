@@ -156,7 +156,7 @@ function Models({ models, providers, onChanged, onEdit }: { models: ModelRoute[]
     await onChanged();
   }
   if (!models.length) return <Empty>还没有公开模型映射。先创建上游，再添加模型。</Empty>;
-  return <section className="panel table-panel"><table><thead><tr><th>公开模型名</th><th>上游模型</th><th>上游</th><th>接入模式 / 推理</th><th>最大输出</th><th>状态</th><th /></tr></thead><tbody>{models.map((model) => <tr key={model.id}><td><code>{model.public_name}</code></td><td>{model.upstream_model}</td><td>{providerName(model.provider_id)}</td><td>{modeLabel(model.api_mode)}<br /><small>{model.reasoning_effort ? `固定 ${model.reasoning_effort}` : "不固定"}</small></td><td>{formatNumber(model.max_output_tokens)}</td><td><span className={`pill ${model.active ? "pill-ok" : ""}`}>{model.active ? "启用" : "停用"}</span></td><td className="row-actions"><Button variant="ghost" onClick={() => onEdit(model)}>编辑</Button><Button variant="ghost" onClick={() => toggle(model)}>{model.active ? "停用" : "启用"}</Button></td></tr>)}</tbody></table></section>;
+  return <section className="panel table-panel"><table><thead><tr><th>公开模型名</th><th>上游模型</th><th>上游</th><th>接入模式 / 推理</th><th>允许上限 / 默认额度</th><th>状态</th><th /></tr></thead><tbody>{models.map((model) => <tr key={model.id}><td><code>{model.public_name}</code></td><td>{model.upstream_model}</td><td>{providerName(model.provider_id)}</td><td>{modeLabel(model.api_mode)}<br /><small>{model.reasoning_effort ? `固定 ${model.reasoning_effort}` : "不固定"}</small></td><td>{formatNumber(model.max_output_tokens)}<br /><small>默认：{model.default_output_tokens == null ? "自动 · 按模式" : formatNumber(model.default_output_tokens)}</small></td><td><span className={`pill ${model.active ? "pill-ok" : ""}`}>{model.active ? "启用" : "停用"}</span></td><td className="row-actions"><Button variant="ghost" onClick={() => onEdit(model)}>编辑</Button><Button variant="ghost" onClick={() => toggle(model)}>{model.active ? "停用" : "启用"}</Button></td></tr>)}</tbody></table></section>;
 }
 
 function UsersView({ users, models, onChanged, onReset, onEdit }: { users: User[]; models: ModelRoute[]; onChanged: () => Promise<void>; onReset: (user: User) => void; onEdit: (user: User) => void }) {
@@ -208,7 +208,7 @@ function ProviderForm({ provider, onClose, onSaved }: { provider?: Provider; onC
 }
 
 function ModelForm({ model, providers, onClose, onSaved }: { model?: ModelRoute; providers: Provider[]; onClose: () => void; onSaved: () => Promise<void> }) {
-  const [form, setForm] = useState({ public_name: model?.public_name ?? "", upstream_model: model?.upstream_model ?? "", provider_id: model?.provider_id ?? providers[0]?.id ?? "", max_output_tokens: model?.max_output_tokens ?? 16384, tokenizer: model?.tokenizer ?? "cl100k_base", api_mode: model?.api_mode ?? "chat", reasoning_effort: model?.reasoning_effort ?? "" });
+  const [form, setForm] = useState({ public_name: model?.public_name ?? "", upstream_model: model?.upstream_model ?? "", provider_id: model?.provider_id ?? providers[0]?.id ?? "", max_output_tokens: model?.max_output_tokens ?? 128000, default_output_tokens: model?.default_output_tokens == null ? "" : String(model.default_output_tokens), tokenizer: model?.tokenizer ?? "cl100k_base", api_mode: model?.api_mode ?? "chat", reasoning_effort: model?.reasoning_effort ?? "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(event: FormEvent) {
@@ -216,7 +216,7 @@ function ModelForm({ model, providers, onClose, onSaved }: { model?: ModelRoute;
     try {
       await api(model ? `/api/admin/models/${model.id}` : "/api/admin/models", {
         method: model ? "PATCH" : "POST",
-        body: JSON.stringify({ ...form, reasoning_effort: form.reasoning_effort || null })
+        body: JSON.stringify({ ...form, default_output_tokens: form.default_output_tokens === "" ? null : Number(form.default_output_tokens), reasoning_effort: form.reasoning_effort || null })
       });
       await onSaved();
     } catch (reason) { setError(reason instanceof Error ? reason.message : "保存失败"); }
@@ -237,7 +237,9 @@ function ModelForm({ model, providers, onClose, onSaved }: { model?: ModelRoute;
         </SelectField>
       </div>
       <p className="notice">固定档位不可覆盖；工具调用需开启编码模式。</p>
-      <Field label="最大输出 Token" type="number" min={1} max={262144} value={form.max_output_tokens} onChange={(e) => setForm({ ...form, max_output_tokens: Number(e.target.value) })} hint={`${formatTokens(form.max_output_tokens)} · 包含推理与回答；不是输入上限，需小于用户及 Key 可用 TPM。`} />
+      <Field label="模型允许上限 Token" type="number" min={1} max={393216} value={form.max_output_tokens} onChange={(e) => setForm({ ...form, max_output_tokens: Number(e.target.value) })} hint={`${formatTokens(form.max_output_tokens)} · 单次输出硬上限，包含推理与回答；不会按此上限为所有请求预留额度。`} />
+      <Field label="默认输出额度 Token" type="number" min={1} max={form.max_output_tokens} placeholder="自动 · 按模型、接口和推理档位" value={form.default_output_tokens} onChange={(e) => setForm({ ...form, default_output_tokens: e.target.value })} hint="客户端未指定时使用；留空自动选择。OpenAI：32K / 64K；DeepSeek：非思考 8K、思考 64K、max 128K，均不超过允许上限。" />
+      <p className="notice">按估算输入 + 本次输出额度预留 TPM 和月额度；收到 usage 后按实际用量结算。客户端可在允许上限内自行指定输出额度。</p>
       <Field label="Tokenizer" value={form.tokenizer} onChange={(e) => setForm({ ...form, tokenizer: e.target.value })} />
       {error && <InlineError message={error} />}
       <div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit" disabled={busy}>{busy ? "正在保存…" : "保存映射"}</Button></div>

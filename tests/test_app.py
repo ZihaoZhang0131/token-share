@@ -112,6 +112,26 @@ def test_full_admin_user_and_proxy_flow():
         )
         assert response.status_code == 201, response.text
 
+        model = response.json()
+        assert model["default_output_tokens"] is None
+        model_url = f"/api/admin/models/{model['id']}"
+        assert client.patch(model_url, headers=csrf_headers(admin), json={
+            "default_output_tokens": 257,
+        }).status_code == 422
+        response = client.patch(model_url, headers=csrf_headers(admin), json={
+            "default_output_tokens": 128,
+        })
+        assert response.status_code == 200 and response.json()["default_output_tokens"] == 128
+        assert client.patch(model_url, headers=csrf_headers(admin), json={
+            "max_output_tokens": 64,
+        }).status_code == 422
+        assert client.patch(model_url, headers=csrf_headers(admin), json={
+            "default_output_tokens": None,
+        }).json()["default_output_tokens"] is None
+        assert client.patch(model_url, headers=csrf_headers(admin), json={
+            "max_output_tokens": None,
+        }).status_code == 422
+
         response = client.post(
             "/api/admin/users",
             headers=csrf_headers(admin),

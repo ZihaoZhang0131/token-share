@@ -98,7 +98,8 @@ class ModelCreate(BaseModel):
     public_name: str = Field(pattern=r"^[A-Za-z0-9._:-]{1,120}$")
     upstream_model: str = Field(min_length=1, max_length=200)
     provider_id: str
-    max_output_tokens: int = Field(default=4096, ge=1, le=262144)
+    max_output_tokens: int = Field(default=4096, ge=1, le=393216)
+    default_output_tokens: Optional[int] = Field(default=None, ge=1, le=393216)
     tokenizer: str = Field(default="cl100k_base", min_length=1, max_length=50)
     api_mode: Literal["chat", "responses", "both"] = "chat"
     reasoning_effort: Optional[
@@ -110,7 +111,8 @@ class ModelUpdate(BaseModel):
     public_name: Optional[str] = Field(default=None, pattern=r"^[A-Za-z0-9._:-]{1,120}$")
     upstream_model: Optional[str] = Field(default=None, min_length=1, max_length=200)
     provider_id: Optional[str] = None
-    max_output_tokens: Optional[int] = Field(default=None, ge=1, le=262144)
+    max_output_tokens: Optional[int] = Field(default=None, ge=1, le=393216)
+    default_output_tokens: Optional[int] = Field(default=None, ge=1, le=393216)
     tokenizer: Optional[str] = Field(default=None, min_length=1, max_length=50)
     active: Optional[bool] = None
     api_mode: Optional[Literal["chat", "responses", "both"]] = None
@@ -125,6 +127,7 @@ class ModelView(ORMModel):
     upstream_model: str
     provider_id: str
     max_output_tokens: int
+    default_output_tokens: Optional[int]
     tokenizer: str
     api_mode: str
     reasoning_effort: Optional[str]

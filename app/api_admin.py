@@ -336,10 +336,13 @@ async def create_model(
     identity: SessionIdentity = Depends(require_admin_csrf),
     db: AsyncSession = Depends(get_db),
 ):
-    from app.model_policy import validate_route
+    from app.model_policy import validate_output_limits, validate_route
 
     try:
         validate_route(payload.upstream_model, payload.reasoning_effort)
+        validate_output_limits(
+            payload.upstream_model, payload.max_output_tokens, payload.default_output_tokens
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from None
     provider = await db.get(Provider, payload.provider_id)
@@ -376,14 +379,22 @@ async def update_model(
     if not route:
         raise HTTPException(status_code=404, detail="模型不存在")
     changes = payload.model_dump(exclude_unset=True)
-    from app.model_policy import validate_route
+    from app.model_policy import validate_output_limits, validate_route
 
-    if any(value is None for key, value in changes.items() if key != "reasoning_effort"):
-        raise HTTPException(status_code=422, detail="仅推理强度允许清空")
+    if any(
+        value is None for key, value in changes.items()
+        if key not in {"reasoning_effort", "default_output_tokens"}
+    ):
+        raise HTTPException(status_code=422, detail="仅推理强度和默认输出额度允许清空")
     try:
         validate_route(
             changes.get("upstream_model", route.upstream_model),
             changes.get("reasoning_effort", route.reasoning_effort),
+        )
+        validate_output_limits(
+            changes.get("upstream_model", route.upstream_model),
+            changes.get("max_output_tokens", route.max_output_tokens),
+            changes.get("default_output_tokens", route.default_output_tokens),
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from None

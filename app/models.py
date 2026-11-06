@@ -111,6 +111,7 @@ class ModelRoute(Base):
     upstream_model: Mapped[str] = mapped_column(String(200))
     provider_id: Mapped[str] = mapped_column(ForeignKey("providers.id", ondelete="RESTRICT"))
     max_output_tokens: Mapped[int] = mapped_column(Integer, default=4096)
+    default_output_tokens: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     tokenizer: Mapped[str] = mapped_column(String(50), default="cl100k_base")
     api_mode: Mapped[str] = mapped_column(String(16), default="chat", server_default="chat")
     reasoning_effort: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)

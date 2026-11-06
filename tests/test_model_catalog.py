@@ -113,6 +113,36 @@ def test_catalog_transaction_idempotency_and_permissions(tmp_path, monkeypatch, 
                     assert base.max_output_tokens == 100000 and base.api_mode == "both"
                 assert (await db.get(User, uid)).allowed_models == ["existing-only"]
                 assert (await db.get(User, uid)).password_hash == "fixture"
+                for route in routes:
+                    if deepseek and route.public_name == "deepseek-v4-pro":
+                        continue
+                    assert route.max_output_tokens == (393216 if deepseek else 128000)
+                    assert route.default_output_tokens is None
+
+            spec = importlib.util.spec_from_file_location(
+                "output_budgets", Path(__file__).resolve().parents[1]
+                / "scripts/configure_output_budgets.py",
+            )
+            budgets = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(budgets)
+            monkeypatch.setattr(budgets, "SessionLocal", sessions)
+            # Simulate migration 0003's conservative backfill.
+            async with sessions() as db:
+                for route in await db.scalars(select(ModelRoute)):
+                    route.default_output_tokens = route.max_output_tokens
+                await db.commit()
+            assert len(await budgets.configure()) == len(routes)
+            async with sessions() as db:
+                assert all(r.default_output_tokens is not None
+                           for r in await db.scalars(select(ModelRoute)))
+            assert len(await budgets.configure(apply=True)) == len(routes)
+            assert await budgets.configure(apply=True) == []
+            async with sessions() as db:
+                assert all(r.default_output_tokens is None
+                           and r.max_output_tokens == (393216 if deepseek else 128000)
+                           for r in await db.scalars(select(ModelRoute)))
+                assert (await db.get(User, uid)).allowed_models == ["existing-only"]
+                assert (await db.get(User, uid)).password_hash == "fixture"
             available.pop()
             with pytest.raises(RuntimeError, match="missing models"):
                 await catalog.configure(pid, apply=True)

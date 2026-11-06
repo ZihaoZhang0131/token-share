@@ -71,7 +71,8 @@ async def configure(provider_id, apply=False):
                         reasoning_effort=effort,
                         api_mode="both",
                         active=True,
-                        max_output_tokens=16384,
+                        max_output_tokens=393216,
+                        default_output_tokens=None,
                         tokenizer="cl100k_base",
                     )
                 )

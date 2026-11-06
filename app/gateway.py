@@ -198,11 +198,12 @@ async def relay(payload, protocol, request, identity, db):
         else ("input", "instructions", "tools", "text")
     )
     estimated = estimate_tokens({k: payload[k] for k in fields if k in payload}, route.tokenizer)
-    budget = (
-        payload.get("max_output_tokens")
-        or payload.get("max_completion_tokens")
-        or payload.get("max_tokens")
+    # prepare_payload has resolved the client/default budget and sends this exact
+    # amount upstream. Never reserve the route's capability ceiling instead.
+    budget_field = "max_output_tokens" if protocol == "responses" else (
+        "max_completion_tokens" if "max_completion_tokens" in payload else "max_tokens"
     )
+    budget = payload[budget_field]
     try:
         await validate_upstream_url(route.provider.base_url, settings.allow_private_upstreams)
         secret = decrypt_secret(
@@ -228,7 +229,14 @@ async def relay(payload, protocol, request, identity, db):
             baseline_monthly=totals["total_tokens"],
         )
     except QuotaExceeded as exc:
-        return openai_error(429, exc.message, exc.code, request_id)
+        message = exc.message
+        if exc.code in {"rate_limit_tpm", "monthly_quota_exceeded"}:
+            message += (
+                f"；本次预留 {estimated + budget} Token"
+                f"（估算输入 {estimated} + 输出额度 {budget}），"
+                f"可降低 {budget_field} 后重试"
+            )
+        return openai_error(429, message, exc.code, request_id)
     settled = False
 
     async def settle(counts, status, error=None, started_upstream=True):

@@ -230,6 +230,58 @@ def test_stateless_tools_roundtrip(relay_client):
     assert seen[1]["input"] == history and seen[1]["tools"] == tools
 
 
+@pytest.mark.parametrize("explicit", [None, 512, 100000])
+@pytest.mark.parametrize("has_usage", [True, False])
+def test_reservation_uses_request_budget_not_model_ceiling(relay_client, monkeypatch,
+                                                        explicit, has_usage):
+    client, aliases, uid = relay_client
+    expected = 32768 if explicit is None else explicit
+
+    async def configure():
+        async with SessionLocal() as db:
+            route = await db.scalar(select(ModelRoute).where(ModelRoute.public_name == aliases[0]))
+            route.max_output_tokens = 128000
+            route.default_output_tokens = 32768
+            user = await db.get(User, uid)
+            # Default request fits; reserving 128K would reject it.
+            user.tpm_limit = 110000 if explicit == 100000 else 40000
+            await db.commit()
+
+    client.portal.call(configure)
+    reserved = []
+    reserve = app.state.quota.reserve
+
+    async def capture(**kwargs):
+        reserved.append(kwargs["tokens"])
+        return await reserve(**kwargs)
+
+    monkeypatch.setattr(app.state.quota, "reserve", capture)
+
+    def upstream(req):
+        body = json.loads(req.content)
+        assert body["max_output_tokens"] == expected
+        return httpx.Response(200, json=completion(body, usage=has_usage))
+
+    app.state.upstream_transport = httpx.MockTransport(upstream)
+    payload = {"model": aliases[0], "input": "hello"}
+    if explicit is not None:
+        payload["max_output_tokens"] = explicit
+    response = client.post("/v1/responses", json=payload)
+    assert response.status_code == 200, response.text
+    assert expected < reserved[0] < expected + 100
+
+    async def check():
+        async with SessionLocal() as db:
+            row = await db.scalar(select(UsageLedger).where(UsageLedger.user_id == uid))
+            assert row.total_tokens == (20 if has_usage else reserved[0])
+            assert row.output_tokens == (8 if has_usage else expected)
+
+    client.portal.call(check)
+    # A valid model budget can still exceed this user's available TPM.
+    response = client.post("/v1/responses", json={**payload, "max_output_tokens": 128000})
+    assert response.status_code == 429
+
+
 def test_official_sdk_and_revocation(relay_client):
     from openai import OpenAI
 

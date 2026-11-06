@@ -23,7 +23,7 @@ def test_deepseek_effort_translation(model, effort):
     assert chat.get("reasoning_effort") == (None if effort == "none" else effort)
     response = prepare_payload(route(model, effort), {}, "responses")
     assert response["reasoning"] == {"effort": effort}
-    assert response["max_output_tokens"] == 16384
+    assert response["max_output_tokens"] == (8192 if effort == "none" else 16384)
     assert chat["store"] is False and response["store"] is False
 
 

@@ -36,6 +36,7 @@ export interface ModelRoute {
   upstream_model: string;
   provider_id: string;
   max_output_tokens: number;
+  default_output_tokens: number | null;
   api_mode: "chat" | "responses" | "both";
   reasoning_effort: string | null;
   tokenizer: string;
