@@ -1,0 +1,6 @@
+Fusion Pixel Font, release 2026.10.25
+https://github.com/TakWolf/fusion-pixel-font
+Source asset: fusion-pixel-font-12px-proportional-otf.woff2-v2026.10.25.zip
+Original font: fusion-pixel-12px-proportional-zh_hans.otf.woff2
+Redistributed without modification, renamed locally for stable CSS URL.
+See OFL.txt and LICENSES/ for original notices.

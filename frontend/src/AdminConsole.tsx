@@ -8,16 +8,17 @@ import {
   FileSearch,
   Plus,
   RefreshCw,
-  Route,
   ScrollText,
-  ShieldCheck,
   Users
 } from "lucide-react";
 import { api, formatDate, formatNumber } from "./api";
 import { Button, Empty, Field, InlineError, Modal, SelectField } from "./components";
-import type { AuditLog, DashboardStats, ModelRoute, Provider, UsageLog, User } from "./types";
+import type { AuditLog, ModelRoute, Provider, UsageLog, User } from "./types";
 import { modeLabel } from "./IntegrationGuide";
 import { loadAdminSection } from "./loadAdminSection";
+import Analytics from "./Analytics";
+import { formatTokens } from "./formatTokens";
+import { PixelIcon } from "./PixelIcon";
 
 type Tab = "overview" | "providers" | "models" | "users" | "logs" | "audit";
 
@@ -32,7 +33,7 @@ const tabs: { id: Tab; label: string; icon: typeof Activity }[] = [
 
 export default function AdminConsole() {
   const [tab, setTab] = useState<Tab>("overview");
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [refreshVersion, setRefreshVersion] = useState(0);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [models, setModels] = useState<ModelRoute[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -57,7 +58,6 @@ export default function AdminConsole() {
       });
     }
     const results = await Promise.all([
-      loadPart<DashboardStats>("总览", "/api/admin/dashboard", setStats),
       loadPart<Provider[]>("上游", "/api/admin/providers", setProviders),
       loadPart<ModelRoute[]>("模型", "/api/admin/models", setModels),
       loadPart<User[]>("用户列表", "/api/admin/users", setUsers),
@@ -78,21 +78,13 @@ export default function AdminConsole() {
 
   return (
     <div className="console-layout">
-      <aside className="side-nav">
-        <div><p className="nav-caption">管理控制台</p>{tabs.map(({ id, label, icon: Icon }) => (
-          <button className={tab === id ? "active" : ""} key={id} onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined}><Icon size={17} />{label}</button>
-        ))}</div>
-        <div className="security-note"><CheckCircle2 size={17} /><span><strong>密钥保护已启用</strong><small>真实 Key 不会返回浏览器</small></span></div>
-      </aside>
+      <nav className="menu-tabs" aria-label="管理控制台">{tabs.map(({ id, label }) => (
+        <button className={tab === id ? "active" : ""} key={id} onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined}><PixelIcon name={id} />{label}</button>
+      ))}</nav>
       <main className="workspace">
         <div className="admin-instrument-header">
-          <div className="instrument-title"><h1>{tabs.find((item) => item.id === tab)?.label}</h1><p>管理访问链路、额度与运行状态</p></div>
-          <div className="instrument-readouts" aria-label="系统读数">
-            <span><small>30D REQUESTS</small><strong>{stats ? formatNumber(stats.requests) : "—"}</strong></span>
-            <span><small>MODELS</small><strong>{stats ? formatNumber(stats.models) : "—"}</strong></span>
-            <span><small>USERS</small><strong>{stats ? formatNumber(stats.users) : "—"}</strong></span>
-          </div>
-          <div className="page-actions"><Button variant="secondary" onClick={loadAll} disabled={loading}><RefreshCw size={15} />{loading ? "正在刷新…" : "刷新"}</Button>
+          <div className="instrument-title"><h1>{tabs.find((item) => item.id === tab)?.label}</h1></div>
+          <div className="page-actions"><Button variant="secondary" onClick={() => { setRefreshVersion(v => v + 1); void loadAll(); }} disabled={loading}><RefreshCw size={15} />{loading ? "正在刷新…" : "刷新"}</Button>
             {tab === "overview" && <Button variant="secondary" onClick={() => setTab("logs")}><ScrollText size={15} />查看日志</Button>}
             {tab === "overview" && <Button onClick={() => setModal("provider")}><Plus size={16} />新增上游</Button>}
             {tab === "providers" && <Button onClick={() => setModal("provider")}><Plus size={16} />新增上游</Button>}
@@ -101,7 +93,7 @@ export default function AdminConsole() {
           </div>
         </div>
         {error && <InlineError message={error} />}
-        {tab === "overview" && <Overview stats={stats} logs={logs} providers={providers} models={models} users={users} />}
+        {tab === "overview" && <Overview refreshVersion={refreshVersion} logs={logs} providers={providers} models={models} users={users} />}
         {tab === "providers" && <Providers providers={providers} onChanged={loadAll} onEdit={setEditProvider} />}
         {tab === "models" && <Models models={models} providers={providers} onChanged={loadAll} onEdit={setEditModel} />}
         {tab === "users" && <UsersView users={users} models={models} onChanged={loadAll} onReset={setResetUser} onEdit={setEditUser} />}
@@ -119,93 +111,19 @@ export default function AdminConsole() {
   );
 }
 
-function Overview({ stats, logs, providers, models, users }: { stats: DashboardStats | null; logs: UsageLog[]; providers: Provider[]; models: ModelRoute[]; users: User[] }) {
-  if (!stats) return <div className="skeleton-grid"><div /><div /><div /><div /></div>;
+function Overview({ refreshVersion, logs, providers, models, users }: { refreshVersion: number; logs: UsageLog[]; providers: Provider[]; models: ModelRoute[]; users: User[] }) {
   return <>
-    <AccessCircuit stats={stats} logs={logs} providers={providers} models={models} users={users} />
+    <div className="station-status"><span><i className="status-dot ok" />补给站概况</span><span>{providers.filter(p => p.active).length} 个启用上游</span><span>{models.filter(m => m.active).length} 个可用模型</span><span>{users.filter(u => u.role === "user").length} 位用户</span></div>
+    <Analytics admin refreshVersion={refreshVersion} />
     <section className="panel operations-panel">
-      <div className="panel-head"><div><h2>上游状态</h2><p>凭证边界与连接参数；健康度以启用状态和真实调用结果为准</p></div><Database size={20} /></div>
+      <div className="panel-head"><div><h2>上游状态</h2></div><Database size={20} /></div>
       <ProviderLedger providers={providers} logs={logs} models={models} />
     </section>
     <section className="panel">
-      <div className="panel-head"><div><h2>最近调用</h2><p>仅展示元数据，不保存输入和回答正文</p></div><Activity size={20} /></div>
+      <div className="panel-head"><div><h2>最近调用</h2></div><Activity size={20} /></div>
       <LogTable logs={logs.slice(0, 8)} />
     </section>
   </>;
-}
-
-function AccessCircuit({ stats, logs, providers, models, users }: { stats: DashboardStats; logs: UsageLog[]; providers: Provider[]; models: ModelRoute[]; users: User[] }) {
-  const activeProviders = providers.filter((provider) => provider.active).length;
-  const activeModels = models.filter((model) => model.active).length;
-  const ordinaryUsers = users.filter((user) => user.role === "user");
-  const activeUsers = ordinaryUsers.filter((user) => user.active).length;
-  const hasRecentFault = logs.slice(0, 20).some((log) => log.status_code >= 400);
-  const providerName = (id: string) => providers.find((provider) => provider.id === id)?.name ?? "未接通上游";
-  const stateClass = (state: "live" | "warn" | "fault") => `state-${state}`;
-
-  return <section className="access-circuit" aria-labelledby="access-circuit-title">
-    <div className="circuit-head">
-      <div><h2 id="access-circuit-title">访问链路</h2><p>上游凭证 → 公开模型 → 配额校验 → 用户权限</p></div>
-      <div className="circuit-legend"><span><i className="legend-live" />通路</span><span><i className="legend-warn" />降级 / 待配置</span><span><i className="legend-fault" />阻断</span></div>
-    </div>
-    <div className="single-line-board">
-      <svg className="single-line-svg" viewBox="0 0 1400 310" preserveAspectRatio="none" aria-hidden="true">
-        <path className="line-live" d="M38 150 H1362" />
-        <path className="line-branch" d="M405 150 V52 H665 M405 150 V254 H665" />
-        <path className={hasRecentFault ? "line-fault" : "line-live"} d="M880 150 H1030" />
-        <circle className="line-node-dot" cx="38" cy="150" r="7" />
-        <circle className="line-node-dot" cx="405" cy="150" r="7" />
-        <circle className="line-node-dot" cx="880" cy="150" r="7" />
-        <circle className="line-node-dot" cx="1362" cy="150" r="7" />
-      </svg>
-      <div className="single-line-nodes">
-        <article className={`line-node source-node ${stateClass(activeProviders ? "live" : "warn")}`}>
-          <div className="node-symbol"><Database size={22} /></div>
-          <div className="node-copy"><span>上游服务</span><strong>{providers.length ? `${activeProviders} / ${providers.length}` : "待配置"}</strong><small>加密凭证 · 公网 HTTPS</small></div>
-          <i className="state-lamp" aria-label={activeProviders ? "通路" : "待配置"} />
-        </article>
-
-        <div className={`line-node breaker-node ${stateClass(activeProviders ? "live" : "warn")}`}>
-          <span>凭证断路器</span><i className="breaker-symbol" aria-hidden="true" /><small>{activeProviders ? "闭合" : "断开"}</small>
-        </div>
-
-        <article className={`line-node mapping-node ${stateClass(activeModels ? "live" : "warn")}`}>
-          <div className="mapping-title"><Boxes size={18} /><span>公开模型路由</span><strong>{activeModels} / {models.length}</strong></div>
-          <div className="mapping-lines">
-            {models.slice(0, 3).map((model) => <div key={model.id}><code>{model.public_name}</code><i /><small>{providerName(model.provider_id)}</small></div>)}
-            {!models.length && <div className="mapping-empty"><code>等待模型映射</code><i /><small>未接通上游</small></div>}
-          </div>
-        </article>
-
-        <div className={`line-node breaker-node ${stateClass(hasRecentFault ? "fault" : "live")}`}>
-          <span>配额断路器</span><i className="breaker-symbol" aria-hidden="true" /><small>{hasRecentFault ? "最近有阻断" : "逐次校验"}</small>
-        </div>
-
-        <article className={`line-node endpoint-node ${stateClass(activeModels ? "live" : "warn")}`}>
-          <div className="node-symbol"><Route size={22} /></div>
-          <div className="node-copy"><span>统一出口</span><strong>/v1/*</strong><small>公开别名 · 标准协议</small></div>
-          <i className="state-lamp" aria-label={activeModels ? "通路" : "待配置"} />
-        </article>
-
-        <div className={`line-node breaker-node ${stateClass(activeUsers ? "live" : "warn")}`}>
-          <span>授权断路器</span><i className="breaker-symbol" aria-hidden="true" /><small>{activeUsers ? "闭合" : "断开"}</small>
-        </div>
-
-        <article className={`line-node user-node ${stateClass(activeUsers ? "live" : "warn")}`}>
-          <div className="node-symbol"><ShieldCheck size={22} /></div>
-          <div className="node-copy"><span>用户权限</span><strong>{ordinaryUsers.length ? `${activeUsers} / ${ordinaryUsers.length}` : "待配置"}</strong><small>独立 Key · 模型授权</small></div>
-          <i className="state-lamp" aria-label={activeUsers ? "通路" : "待配置"} />
-        </article>
-      </div>
-    </div>
-    <div className="telemetry-strip" aria-label="控制面遥测">
-      <span><small>UPSTREAM</small><strong>{activeProviders}/{providers.length}</strong></span>
-      <span><small>ROUTES</small><strong>{activeModels}/{models.length}</strong></span>
-      <span><small>USERS</small><strong>{activeUsers}/{ordinaryUsers.length}</strong></span>
-      <span><small>30D REQUESTS</small><strong>{formatNumber(stats.requests)}</strong></span>
-      <span><small>LOG MODE</small><strong>仅元数据</strong></span>
-    </div>
-  </section>;
 }
 
 function Providers({ providers, onChanged, onEdit }: { providers: Provider[]; onChanged: () => Promise<void>; onEdit: (provider: Provider) => void }) {
@@ -248,7 +166,7 @@ function UsersView({ users, models, onChanged, onReset, onEdit }: { users: User[
     await onChanged();
   }
   if (!ordinary.length) return <Empty>还没有用户账号。用户必须由管理员创建。</Empty>;
-  return <section className="panel table-panel"><table><thead><tr><th>用户</th><th>月额度</th><th>速率上限</th><th>模型权限</th><th>状态</th><th /></tr></thead><tbody>{ordinary.map((user) => <tr key={user.id}><td><strong>{user.display_name}</strong><small>{user.email}</small></td><td>{formatNumber(user.monthly_token_limit)}</td><td>{formatNumber(user.rpm_limit)} RPM<small>{formatNumber(user.tpm_limit)} TPM</small></td><td>{user.allowed_models.length ? user.allowed_models.join("、") : "未分配"}<small>{models.length} 个模型可配置</small></td><td><span className={`pill ${user.active ? "pill-ok" : ""}`}>{user.active ? (user.must_change_password ? "待改密" : "正常") : "停用"}</span></td><td className="row-actions"><Button variant="ghost" onClick={() => onEdit(user)}>编辑</Button><Button variant="ghost" onClick={() => onReset(user)}>重置密码</Button><Button variant="ghost" onClick={() => toggle(user)}>{user.active ? "停用" : "启用"}</Button></td></tr>)}</tbody></table></section>;
+  return <section className="panel table-panel"><table><thead><tr><th>用户</th><th>月额度</th><th>速率上限</th><th>模型权限</th><th>状态</th><th /></tr></thead><tbody>{ordinary.map((user) => <tr key={user.id}><td><strong>{user.display_name}</strong><small>{user.email}</small></td><td title={`${user.monthly_token_limit.toLocaleString()} Token`}>{formatTokens(user.monthly_token_limit)}</td><td>{formatNumber(user.rpm_limit)} RPM<small>{formatNumber(user.tpm_limit)} TPM</small></td><td>{user.allowed_models.length ? user.allowed_models.join("、") : "未分配"}<small>{models.length} 个模型可配置</small></td><td><span className={`pill ${user.active ? "pill-ok" : ""}`}>{user.active ? (user.must_change_password ? "待改密" : "正常") : "停用"}</span></td><td className="row-actions"><Button variant="ghost" onClick={() => onEdit(user)}>编辑</Button><Button variant="ghost" onClick={() => onReset(user)}>重置密码</Button><Button variant="ghost" onClick={() => toggle(user)}>{user.active ? "停用" : "启用"}</Button></td></tr>)}</tbody></table></section>;
 }
 
 function Logs({ logs, users }: { logs: UsageLog[]; users: User[] }) {
@@ -256,13 +174,13 @@ function Logs({ logs, users }: { logs: UsageLog[]; users: User[] }) {
   const [status, setStatus] = useState("");
   const userName = (id: string) => users.find((user) => user.id === id)?.display_name ?? id.slice(0, 8);
   const filtered = logs.filter((log) => (!model || log.model_alias.includes(model)) && (!status || String(log.status_code) === status));
-  return <><div className="filters"><Field label="模型" placeholder="筛选公开模型名" value={model} onChange={(e) => setModel(e.target.value)} /><Field label="状态码" placeholder="例如 200" value={status} onChange={(e) => setStatus(e.target.value)} /></div><section className="panel table-panel"><table><thead><tr><th>时间</th><th>请求 ID</th><th>用户</th><th>模型</th><th>Token</th><th>耗时</th><th>状态</th></tr></thead><tbody>{filtered.map((log) => <tr key={log.request_id}><td>{formatDate(log.created_at)}</td><td><code>{log.request_id.slice(0, 16)}…</code></td><td>{userName(log.user_id)}</td><td>{log.model_alias}</td><td>{formatNumber(log.total_tokens)}</td><td>{log.latency_ms} ms</td><td><span className={`pill ${log.status_code < 400 ? "pill-ok" : "pill-bad"}`}>{log.status_code}</span></td></tr>)}</tbody></table>{!filtered.length && <Empty>没有符合条件的调用记录</Empty>}</section></>;
+  return <><div className="filters"><Field label="模型" placeholder="筛选公开模型名" value={model} onChange={(e) => setModel(e.target.value)} /><Field label="状态码" placeholder="例如 200" value={status} onChange={(e) => setStatus(e.target.value)} /></div><section className="panel table-panel"><table><thead><tr><th>时间</th><th>请求 ID</th><th>用户</th><th>模型</th><th>消耗 (M)</th><th>耗时</th><th>状态</th></tr></thead><tbody>{filtered.map((log) => <tr key={log.request_id}><td>{formatDate(log.created_at)}</td><td><code>{log.request_id.slice(0, 16)}…</code></td><td>{userName(log.user_id)}</td><td>{log.model_alias}</td><td title={`${log.total_tokens.toLocaleString()} Token`}>{formatTokens(log.total_tokens)}</td><td>{log.latency_ms} ms</td><td><span className={`pill ${log.status_code < 400 ? "pill-ok" : "pill-bad"}`}>{log.status_code}</span></td></tr>)}</tbody></table>{!filtered.length && <Empty>没有符合条件的调用记录</Empty>}</section></>;
 }
 
 function LogTable({ logs }: { logs: UsageLog[] }) {
   return <div className="overview-ledger" role="table" aria-label="最近调用元数据">
-    <div className="ledger-row ledger-header" role="row"><span>状态</span><span>公开模型</span><span>请求 ID</span><span>Token</span><span>耗时</span><span>时间</span></div>
-    {logs.length ? logs.map((log) => <div className="ledger-row" role="row" key={log.request_id}><span><i className={`status-dot ${log.status_code < 400 ? "ok" : "bad"}`} />{log.status_code}</span><strong>{log.model_alias}</strong><code>{log.request_id.slice(0, 14)}</code><span>{formatNumber(log.total_tokens)}</span><span>{formatNumber(log.latency_ms)} ms</span><time>{formatDate(log.created_at)}</time></div>) : <div className="ledger-row ledger-empty" role="row"><span><i className="status-dot off" />—</span><strong>尚无调用</strong><code>—</code><span>—</span><span>—</span><time>完成第一次模型调用后显示</time></div>}
+    <div className="ledger-row ledger-header" role="row"><span>状态</span><span>公开模型</span><span>请求 ID</span><span>消耗 (M)</span><span>耗时</span><span>时间</span></div>
+    {logs.length ? logs.map((log) => <div className="ledger-row" role="row" key={log.request_id}><span><i className={`status-dot ${log.status_code < 400 ? "ok" : "bad"}`} />{log.status_code}</span><strong>{log.model_alias}</strong><code>{log.request_id.slice(0, 14)}</code><span title={`${log.total_tokens.toLocaleString()} Token`}>{formatTokens(log.total_tokens)}</span><span>{formatNumber(log.latency_ms)} ms</span><time>{formatDate(log.created_at)}</time></div>) : <div className="ledger-row ledger-empty" role="row"><span><i className="status-dot off" />—</span><strong>尚无调用</strong><code>—</code><span>—</span><span>—</span><time>完成第一次模型调用后显示</time></div>}
   </div>;
 }
 
@@ -318,8 +236,8 @@ function ModelForm({ model, providers, onClose, onSaved }: { model?: ModelRoute;
           {["low", "medium", "high", "xhigh", "max", "none", "minimal"].map((effort) => <option key={effort} value={effort}>{effort}</option>)}
         </SelectField>
       </div>
-      <p className="notice">固定档位不可被客户端覆盖。GPT-6.1 Sol 支持 low 至 max；工具调用需开启编码模式。编码模式不存储会话，工具由客户端执行。</p>
-      <Field label="最大输出 Token" type="number" min={1} max={262144} value={form.max_output_tokens} onChange={(e) => setForm({ ...form, max_output_tokens: Number(e.target.value) })} hint="包含推理与回答；不是输入上限。需小于用户及 Key 可用 TPM。" />
+      <p className="notice">固定档位不可覆盖；工具调用需开启编码模式。</p>
+      <Field label="最大输出 Token" type="number" min={1} max={262144} value={form.max_output_tokens} onChange={(e) => setForm({ ...form, max_output_tokens: Number(e.target.value) })} hint={`${formatTokens(form.max_output_tokens)} · 包含推理与回答；不是输入上限，需小于用户及 Key 可用 TPM。`} />
       <Field label="Tokenizer" value={form.tokenizer} onChange={(e) => setForm({ ...form, tokenizer: e.target.value })} />
       {error && <InlineError message={error} />}
       <div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit" disabled={busy}>{busy ? "正在保存…" : "保存映射"}</Button></div>
@@ -332,7 +250,7 @@ function UserForm({ models, onClose, onSaved }: { models: ModelRoute[]; onClose:
   const [error, setError] = useState("");
   function toggleModel(name: string) { setForm({ ...form, allowed_models: form.allowed_models.includes(name) ? form.allowed_models.filter((item) => item !== name) : [...form.allowed_models, name] }); }
   async function submit(event: FormEvent) { event.preventDefault(); setError(""); try { await api("/api/admin/users", { method: "POST", body: JSON.stringify(form) }); await onSaved(); } catch (reason) { setError(reason instanceof Error ? reason.message : "创建失败"); } }
-  return <Modal title="新增用户" onClose={onClose}><form className="modal-form" onSubmit={submit}><Field label="显示名称" value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} required /><Field label="邮箱" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /><Field label="临时密码" type="password" value={form.temporary_password} onChange={(e) => setForm({ ...form, temporary_password: e.target.value })} required hint="至少 12 位；用户首次登录必须修改" /><Field label="每月 Token 额度" type="number" min={1} value={form.monthly_token_limit} onChange={(e) => setForm({ ...form, monthly_token_limit: Number(e.target.value) })} /><div className="form-grid"><Field label="每把 Key 的 RPM 上限" type="number" min={1} max={10000} value={form.rpm_limit} onChange={(e) => setForm({ ...form, rpm_limit: Number(e.target.value) })} /><Field label="每把 Key 的 TPM 上限" type="number" min={100} value={form.tpm_limit} onChange={(e) => setForm({ ...form, tpm_limit: Number(e.target.value) })} /></div><fieldset className="model-picker"><legend>允许使用的模型</legend>{models.filter((model) => model.active).map((model) => <label key={model.id}><input type="checkbox" checked={form.allowed_models.includes(model.public_name)} onChange={() => toggleModel(model.public_name)} />{model.public_name}</label>)}{!models.length && <small>暂无可分配模型</small>}</fieldset>{error && <InlineError message={error} />}<div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit">创建用户</Button></div></form></Modal>;
+  return <Modal title="新增用户" onClose={onClose}><form className="modal-form" onSubmit={submit}><Field label="显示名称" value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} required /><Field label="邮箱" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /><Field label="临时密码" type="password" value={form.temporary_password} onChange={(e) => setForm({ ...form, temporary_password: e.target.value })} required hint="至少 12 位；用户首次登录必须修改" /><Field label="每月 Token 额度" type="number" min={1} value={form.monthly_token_limit} hint={formatTokens(form.monthly_token_limit)} onChange={(e) => setForm({ ...form, monthly_token_limit: Number(e.target.value) })} /><div className="form-grid"><Field label="每把 Key 的 RPM 上限" type="number" min={1} max={10000} value={form.rpm_limit} onChange={(e) => setForm({ ...form, rpm_limit: Number(e.target.value) })} /><Field label="每把 Key 的 TPM 上限" type="number" min={100} value={form.tpm_limit} hint={formatTokens(form.tpm_limit)} onChange={(e) => setForm({ ...form, tpm_limit: Number(e.target.value) })} /></div><fieldset className="model-picker"><legend>允许使用的模型</legend>{models.filter((model) => model.active).map((model) => <label key={model.id}><input type="checkbox" checked={form.allowed_models.includes(model.public_name)} onChange={() => toggleModel(model.public_name)} />{model.public_name}</label>)}{!models.length && <small>暂无可分配模型</small>}</fieldset>{error && <InlineError message={error} />}<div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit">创建用户</Button></div></form></Modal>;
 }
 
 function UserEditForm({ user, models, onClose, onSaved }: { user: User; models: ModelRoute[]; onClose: () => void; onSaved: () => Promise<void> }) {
@@ -340,7 +258,7 @@ function UserEditForm({ user, models, onClose, onSaved }: { user: User; models: 
   const [error, setError] = useState("");
   function toggleModel(name: string) { setForm({ ...form, allowed_models: form.allowed_models.includes(name) ? form.allowed_models.filter((item) => item !== name) : [...form.allowed_models, name] }); }
   async function submit(event: FormEvent) { event.preventDefault(); setError(""); try { await api(`/api/admin/users/${user.id}`, { method: "PATCH", body: JSON.stringify(form) }); await onSaved(); } catch (reason) { setError(reason instanceof Error ? reason.message : "保存失败"); } }
-  return <Modal title={`编辑用户 · ${user.display_name}`} onClose={onClose}><form className="modal-form" onSubmit={submit}><Field label="显示名称" value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} required /><Field label="每月 Token 额度" type="number" min={1} value={form.monthly_token_limit} onChange={(e) => setForm({ ...form, monthly_token_limit: Number(e.target.value) })} /><div className="form-grid"><Field label="每把 Key 的 RPM 上限" type="number" min={1} max={10000} value={form.rpm_limit} onChange={(e) => setForm({ ...form, rpm_limit: Number(e.target.value) })} /><Field label="每把 Key 的 TPM 上限" type="number" min={100} value={form.tpm_limit} onChange={(e) => setForm({ ...form, tpm_limit: Number(e.target.value) })} /></div><fieldset className="model-picker"><legend>允许使用的模型</legend>{models.filter((model) => model.active || form.allowed_models.includes(model.public_name)).map((model) => <label key={model.id}><input type="checkbox" checked={form.allowed_models.includes(model.public_name)} onChange={() => toggleModel(model.public_name)} />{model.public_name}</label>)}</fieldset>{error && <InlineError message={error} />}<div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit">保存修改</Button></div></form></Modal>;
+  return <Modal title={`编辑用户 · ${user.display_name}`} onClose={onClose}><form className="modal-form" onSubmit={submit}><Field label="显示名称" value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} required /><Field label="每月 Token 额度" type="number" min={1} value={form.monthly_token_limit} hint={formatTokens(form.monthly_token_limit)} onChange={(e) => setForm({ ...form, monthly_token_limit: Number(e.target.value) })} /><div className="form-grid"><Field label="每把 Key 的 RPM 上限" type="number" min={1} max={10000} value={form.rpm_limit} onChange={(e) => setForm({ ...form, rpm_limit: Number(e.target.value) })} /><Field label="每把 Key 的 TPM 上限" type="number" min={100} value={form.tpm_limit} hint={formatTokens(form.tpm_limit)} onChange={(e) => setForm({ ...form, tpm_limit: Number(e.target.value) })} /></div><fieldset className="model-picker"><legend>允许使用的模型</legend>{models.filter((model) => model.active || form.allowed_models.includes(model.public_name)).map((model) => <label key={model.id}><input type="checkbox" checked={form.allowed_models.includes(model.public_name)} onChange={() => toggleModel(model.public_name)} />{model.public_name}</label>)}</fieldset>{error && <InlineError message={error} />}<div className="modal-actions"><Button type="button" variant="secondary" onClick={onClose}>取消</Button><Button type="submit">保存修改</Button></div></form></Modal>;
 }
 
 function ResetPassword({ user, onClose }: { user: User; onClose: () => void }) {

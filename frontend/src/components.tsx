@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 export function Button({
@@ -57,18 +57,22 @@ export function Modal({
 }) {
   const titleId = useId();
   const dialogRef = useRef<HTMLElement>(null);
+  const closeRef = useRef(onClose);
+
+  // Keep event handlers current without re-running focus initialization on each keystroke.
+  useLayoutEffect(() => { closeRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const dialog = dialogRef.current;
-    const preferred = dialog?.querySelector<HTMLElement>("input:not([disabled]), select:not([disabled]), textarea:not([disabled])");
+    const preferred = dialog?.querySelector<HTMLElement>("input:not([disabled]):not([type='hidden']), select:not([disabled]), textarea:not([disabled])");
     const fallback = dialog?.querySelector<HTMLElement>("button:not([disabled]), [href], [tabindex]:not([tabindex='-1'])");
     (preferred ?? fallback)?.focus();
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") { event.preventDefault(); closeRef.current(); return; }
       if (event.key !== "Tab" || !dialog) return;
-      const focusable = [...dialog.querySelectorAll<HTMLElement>("input, select, button, [href], [tabindex]:not([tabindex='-1'])")].filter((item) => !item.hasAttribute("disabled"));
+      const focusable = [...dialog.querySelectorAll<HTMLElement>("input:not([type='hidden']), textarea, select, button, [href], [tabindex]:not([tabindex='-1'])")].filter((item) => !item.hasAttribute("disabled") && item.tabIndex >= 0 && item.getClientRects().length > 0);
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -77,8 +81,11 @@ export function Modal({
     }
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => { document.removeEventListener("keydown", handleKeyDown); previous?.focus(); };
-  }, [onClose]);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (previous?.isConnected) previous.focus();
+    };
+  }, []);
 
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { KeyRound, LogOut } from "lucide-react";
 import { api, setSessionSecurity } from "./api";
 import AdminConsole from "./AdminConsole";
-import { Button, Loading } from "./components";
+import { Loading } from "./components";
 import { Login, PasswordGate } from "./Login";
 import type { Session } from "./types";
 import UserConsole from "./UserConsole";
+import GameFrame from "./GameFrame";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -40,18 +40,8 @@ export default function App() {
   if (session.user.must_change_password) return <PasswordGate session={session} onChanged={acceptSession} />;
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div className="topbar-brand">
-          <span><KeyRound size={18} /></span>
-          <div><strong>Token Station</strong><small>安全访问控制面</small></div>
-        </div>
-        <div className="topbar-user">
-          <div><strong>{session.user.display_name}</strong><small>{session.user.role === "admin" ? "管理员 · 全局控制" : session.user.email}</small></div>
-          <Button variant="ghost" onClick={logout}><LogOut size={16} />退出</Button>
-        </div>
-      </header>
+    <GameFrame name={session.user.display_name} role={session.user.role === "admin" ? "管理员" : "用户"} action="退出" onAction={logout}>
       {session.user.role === "admin" ? <AdminConsole /> : <UserConsole session={session} />}
-    </div>
+    </GameFrame>
   );
 }

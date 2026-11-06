@@ -100,3 +100,38 @@ export interface AuditLog {
   metadata_json: Record<string, unknown>;
   created_at: string;
 }
+
+export type AnalyticsPeriod = "month" | "7d" | "30d";
+
+export interface AnalyticsSummary {
+  requests: number;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  successes: number;
+  failures: number;
+  success_rate: number | null;
+  avg_latency_ms: number | null;
+}
+
+export interface AnalyticsDay extends Omit<AnalyticsSummary, "success_rate"> {
+  date: string;
+}
+
+export interface AnalyticsRank {
+  id: string;
+  label: string;
+  total_tokens: number;
+  requests: number;
+}
+
+export interface AnalyticsData {
+  period: AnalyticsPeriod;
+  start: string;
+  end: string;
+  timezone: string;
+  summary: AnalyticsSummary;
+  daily: AnalyticsDay[];
+  models: AnalyticsRank[];
+  users?: AnalyticsRank[];
+}

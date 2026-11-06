@@ -13,13 +13,15 @@
 
 ## 功能
 
-当前 UI 版本与代码入口见 [当前版本说明](docs/当前版本说明.md)。界面使用 Open Ledger 深色主题，包含访客控制台、登录弹窗、首次改密、管理员六个页签和用户三个页签。
+当前 UI 版本与代码入口见 [当前版本说明](docs/当前版本说明.md)。界面使用暖色像素菜单主题，包含访客控制台、登录弹窗、首次改密、管理员六个页签和用户三个页签。
 
 - `GET /v1/models`
 - `POST /v1/chat/completions`，支持 JSON 和 SSE 流式响应
 - `POST /v1/responses`，支持无状态编码工具循环、JSON 和具名 SSE；不执行客户端工具
 - 模型可配置聊天 / 编码 / 双模式，以及固定推理强度；详见 [聊天与编码模式接入指南](docs/聊天与编码模式接入指南.md)
-- 管理员：上游、公开模型映射、用户、额度、调用日志、审计日志
+- 管理员：上游、公开模型映射、用户、额度、调用日志、审计日志，以及按日趋势与消耗排行
+- 用量图表：北京时间本月 / 近 7 天 / 近 30 天，消耗统一以 M Token 展示
+- 接入指南：聊天、编码 API 与 CC Switch + Codex CLI / 桌面端教程
 - 用户：本月用量、模型权限、创建和撤销最多 5 把访问 Key、接入示例
 - Redis 原子 RPM/TPM/月额度预留，PostgreSQL 最终用量账本
 - Alembic、Docker Compose、Nginx、Let's Encrypt、备份恢复和服务器预检
@@ -35,11 +37,11 @@ pip install -e '.[dev]'
 uvicorn app.main:app --reload
 ```
 
-另一个终端启动前端：
+前端需要 Node 20.19+ 或 22.12+（本次使用 Node 24）。另一个终端启动前端：
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
@@ -55,7 +57,9 @@ npm run dev
 ```bash
 .venv/bin/ruff check app tests alembic
 .venv/bin/pytest -q
-cd frontend && npm run build
+cd frontend && npm test && npm run build
+npm run test:e2e # 首次执行前：npx playwright install chromium
+# 或使用已安装的 Chrome：PW_CHANNEL=chrome npm run test:e2e
 ```
 
 ## 阿里云轻量服务器部署

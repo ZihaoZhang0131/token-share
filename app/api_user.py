@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.analytics import usage_analytics
 from app.database import get_db
 from app.deps import SessionIdentity, current_session, require_csrf
 from app.models import AccessKey, ModelRoute
@@ -13,6 +14,8 @@ from app.schemas import (
     AccessKeyCreate,
     AccessKeyCreated,
     AccessKeyView,
+    AnalyticsPeriod,
+    AnalyticsView,
     ModelView,
     UsageSummary,
     UserView,
@@ -39,6 +42,16 @@ async def my_usage(
 ):
     ensure_ready(identity)
     return await usage_summary(db, identity.user)
+
+
+@router.get("/analytics", response_model=AnalyticsView)
+async def my_analytics(
+    period: AnalyticsPeriod = "month",
+    identity: SessionIdentity = Depends(current_session),
+    db: AsyncSession = Depends(get_db),
+):
+    ensure_ready(identity)
+    return await usage_analytics(db, period, user_id=identity.user.id)
 
 
 @router.get("/models", response_model=list[ModelView])

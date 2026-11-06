@@ -166,6 +166,48 @@ class UsageSummary(BaseModel):
     daily: List[Dict[str, Any]]
 
 
+AnalyticsPeriod = Literal["month", "7d", "30d"]
+
+
+class AnalyticsCounts(BaseModel):
+    requests: int
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+    successes: int
+    failures: int
+    avg_latency_ms: Optional[float]
+
+
+class AnalyticsSummary(AnalyticsCounts):
+    success_rate: Optional[float]
+
+
+class AnalyticsDay(AnalyticsCounts):
+    date: str
+
+
+class AnalyticsRank(BaseModel):
+    id: str
+    label: str
+    total_tokens: int
+    requests: int
+
+
+class AnalyticsView(BaseModel):
+    period: AnalyticsPeriod
+    start: datetime
+    end: datetime
+    timezone: str
+    summary: AnalyticsSummary
+    daily: List[AnalyticsDay]
+    models: List[AnalyticsRank]
+
+
+class AdminAnalyticsView(AnalyticsView):
+    users: List[AnalyticsRank]
+
+
 class AuditView(ORMModel):
     id: str
     actor_user_id: str

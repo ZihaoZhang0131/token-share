@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from "react";
-import { KeyRound, LogIn, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { api } from "./api";
 import { Button, Field, InlineError, Modal } from "./components";
 import type { Session } from "./types";
 import UserConsole from "./UserConsole";
+import GameFrame from "./GameFrame";
 
 export function Login({ onLogin }: { onLogin: (session: Session) => void }) {
   const [email, setEmail] = useState("");
@@ -35,18 +36,7 @@ export function Login({ onLogin }: { onLogin: (session: Session) => void }) {
   };
 
   return (
-    <div className="app-shell guest-shell">
-      <header className="topbar">
-        <div className="topbar-brand">
-          <span><KeyRound size={18} /></span>
-          <div><strong>Token Station</strong><small>安全访问控制面</small></div>
-        </div>
-        <div className="topbar-user">
-          <div><strong>访客</strong><small>未登录</small></div>
-          <Button variant="ghost" onClick={openLogin}><LogIn size={16} />登录</Button>
-        </div>
-      </header>
-
+    <GameFrame name="欢迎来到补给站" role="访客" action="登录" onAction={openLogin}>
       <UserConsole session={null} onLoginRequired={openLogin} />
 
       {loginOpen && (
@@ -64,7 +54,7 @@ export function Login({ onLogin }: { onLogin: (session: Session) => void }) {
           </form>
         </Modal>
       )}
-    </div>
+    </GameFrame>
   );
 }
 

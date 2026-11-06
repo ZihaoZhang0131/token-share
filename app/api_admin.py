@@ -8,13 +8,16 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import case, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.analytics import usage_analytics
 from app.config import get_settings
 from app.database import get_db
 from app.deps import SessionIdentity, require_admin, require_admin_csrf
 from app.models import AuditLog, ModelRoute, Provider, Role, UsageLedger, User, WebSession
 from app.schemas import (
+    AdminAnalyticsView,
     AdminUserCreate,
     AdminUserUpdate,
+    AnalyticsPeriod,
     AuditView,
     ModelCreate,
     ModelUpdate,
@@ -82,6 +85,15 @@ async def dashboard(
         "providers": int(provider_count or 0),
         "models": int(model_count or 0),
     }
+
+
+@router.get("/analytics", response_model=AdminAnalyticsView)
+async def analytics(
+    period: AnalyticsPeriod = "month",
+    _: SessionIdentity = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    return await usage_analytics(db, period)
 
 
 @router.get("/users", response_model=list[UserView])

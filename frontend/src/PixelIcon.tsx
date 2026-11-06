@@ -1,0 +1,39 @@
+const shapes: Record<string, string> = {
+  sprout: "M7 8H9V15H7ZM2 3H6V4H8V8H4V7H2ZM10 1H14V5H12V7H9V3H10Z",
+  usage: "M2 9H5V14H2ZM7 5H10V14H7ZM12 2H15V14H12Z",
+  keys: "M2 2H8V3H9V8H8V9H6V12H4V14H1V11H3V8H2V7H1V3H2ZM4 4V6H6V4Z",
+  guide:
+    "M1 2H7V3H9V2H15V13H9V14H7V13H1ZM3 4V5H6V4ZM10 4V5H13V4ZM3 7V8H6V7ZM10 7V8H13V7Z",
+  overview: "M2 2H7V7H2ZM9 2H14V7H9ZM2 9H7V14H2ZM9 9H14V14H9Z",
+  providers: "M4 1H12V3H14V13H12V15H4V13H2V3H4ZM5 4V6H11V4ZM5 9V11H11V9Z",
+  models: "M6 1H10V3H13V6H15V10H13V13H10V15H6V13H3V10H1V6H3V3H6ZM6 6V10H10V6Z",
+  users: "M5 1H11V3H12V7H10V9H6V7H4V3H5ZM4 10H12V11H14V15H2V11H4Z",
+  logs: "M3 1H11V3H13V15H3ZM5 4V5H9V4ZM5 7V8H11V7ZM5 10V11H11V10Z",
+  audit:
+    "M3 1H13V3H15V9H13V12H11V14H9V15H7V14H5V12H3V9H1V3H3ZM5 7V9H7V11H9V9H11V5H9V7H7V5H5Z",
+  shield: "M3 1H13V3H15V9H13V12H11V14H9V15H7V14H5V12H3V9H1V3H3ZM7 4V11H9V4Z",
+};
+export function PixelIcon({
+  name,
+  size = 22,
+}: {
+  name: string;
+  size?: number;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      className="pixel-icon"
+      aria-hidden="true"
+      shapeRendering="crispEdges"
+    >
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d={shapes[name] ?? shapes.overview}
+      />
+    </svg>
+  );
+}
